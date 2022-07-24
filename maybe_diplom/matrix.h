@@ -11,6 +11,7 @@
 
 using namespace std;
 
+
 double** createm(size_t M, size_t N, bool mod = false) {
     //выделение памяти под указатель
     //mod - нужноли при создании создавать единичную матрицу
