@@ -12,6 +12,8 @@
 using namespace std;
 
 double** createm(size_t M, size_t N, bool mod = false) {
+    //выделение пам€ти под указатель
+    //mod - нужноли при создании создавать единичную матрицу
     double** var = (double**)malloc(M * sizeof(double*));
     for (int i = 0; i < M; i++)
         var[i] = (double*)malloc(N * sizeof(double));
@@ -26,6 +28,8 @@ double** createm(size_t M, size_t N, bool mod = false) {
 }
 
 double* createv(size_t N, bool mod = false) {
+    //выделение пам€ти под указатель
+    //mod - нужноли при создании создавать единичный вектор
     double* var = (double*)malloc(N * sizeof(double));
 
     if (mod)
@@ -36,6 +40,8 @@ double* createv(size_t N, bool mod = false) {
 }
 
 inline void print(double** var, string c = "") {
+    //вывод указател€ var в консоль
+    //c (color) - цвет главной диагонали при выводе на экран: G, g - зелЄный, B, b - синий, R, r - красный, I,i - интенсивнее серого
     size_t M = _msize(var) / sizeof(var[0]);
     size_t N = _msize(var[0]) / sizeof(var[0][0]);
 
@@ -68,8 +74,9 @@ inline void print(double** var, string c = "") {
 }
 
 inline void print(double* var) {
+    //вывод указател€ var в консоль
     size_t M = _msize(var) / sizeof(var[0]);
-
+    
     for (size_t i = 0; i < M; i++)
     {
         printf("%f\n", var[i]);
@@ -80,6 +87,7 @@ inline void print(double* var) {
 }
 
 void space(size_t k = 0) {
+    //вывод пробелов в консоль
     for (size_t ind_k = 0; ind_k < k; ind_k++)
     {
         printf("\n");
@@ -88,6 +96,7 @@ void space(size_t k = 0) {
 }
 
 int size(double **var) {
+    //вычисл€ет объЄм занимаемой пам€ти указателем var
     size_t M = _msize(var) / sizeof(var[0]);
     size_t sum = 0;
     for (size_t i = 0; i < M; i++)
@@ -96,10 +105,51 @@ int size(double **var) {
 }
 
 int size(double* var) {
+    //вычисл€ет объЄм занимаемой пам€ти указателем var
     return _msize(var);
 }
 
+string gm(double**& var) {
+    //метод √аусса
+    size_t M = _msize(var) / sizeof(var[0]);
+    size_t N = _msize(var[0]) / sizeof(var[0][0]);
+
+    if (M + 1 != N) return "Error";
+
+    for (size_t k = 0; k < M; k++) {
+        if (k == 0) printf("\nk=%i\n", k);
+        if (k != 0) printf("k=%i\n", k);
+        fflush(stdout);
+        double ed = 1;
+        if (var[k][k] != ed) {
+            double T = var[k][k];
+            for (size_t j = k; j < N; j++) {
+                var[k][j] = var[k][j] / T;
+            }
+        }
+        for (size_t i = k; i < M; i++) {
+            if ((var[i][k] != ed) && (i != k)) {
+                double T = var[i][k];
+                var[i][k] = 0;
+                for (size_t j = k + 1; j < N; j++) {
+                    var[i][j] -= var[k][j] * T;
+                }
+            }
+        }
+    }
+    for (int i = M - 1; i >= 0; i--) {
+        double Sum = var[i][M];
+        for (size_t j = i + 1.0; j < M; j++) {
+            Sum -= var[i][j] * var[j][M];
+        }
+        var[i][M] = Sum;
+    }
+
+    return "Successfully";
+}
+
 void del(double**& var) {
+    //очистка пам€ти указател€ var
     size_t M = _msize(var) / sizeof(var[0]);
     
     for (size_t i = 0; i < M; i++) free(var[i]);
@@ -107,6 +157,8 @@ void del(double**& var) {
 }
 
 void del(double*& var) {
+    //очистка пам€ти указател€ var
     free(var);
 }
+
 #endif MATRIX_H
