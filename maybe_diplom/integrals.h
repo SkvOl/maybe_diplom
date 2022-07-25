@@ -15,7 +15,7 @@ inline double k(double y1, ...) {
     va_end(args);
 
     //return x1 + x2 - y1 * y2;
-    return x1 - x2;
+    return y1 - y2;
 }
 
 inline double f(double x1, ...) {
@@ -36,7 +36,7 @@ inline double base_func(int i, int j) {
 
 
 inline double I_k(int N_i, double a, double b, double ksi) {
-    //одномерный интеграл для метода Коллокаций 
+    //РѕРґРЅРѕРјРµСЂРЅС‹Р№ РёРЅС‚РµРіСЂР°Р» РґР»СЏ РјРµС‚РѕРґР° РљРѕР»Р»РѕРєР°С†РёР№ 
     double h_int = (b - a) / (N_i * 1.0);
     double Sum = 0.0;
     for (size_t i = 0; i < N_i; i++){
@@ -47,7 +47,7 @@ inline double I_k(int N_i, double a, double b, double ksi) {
 }
 
 inline double I_k(int N_i, double a, double b, double c, double d, double ksi1, double ksi2) {
-    //двумерный интеграл для метода Коллокаций
+    //РґРІСѓРјРµСЂРЅС‹Р№ РёРЅС‚РµРіСЂР°Р» РґР»СЏ РјРµС‚РѕРґР° РљРѕР»Р»РѕРєР°С†РёР№
     double h_i = (b - a) / N_i, h_j = (d - c) / N_i;
     double Sum = 0;
     for (size_t i = 0; i < N_i; i++) {
@@ -60,7 +60,7 @@ inline double I_k(int N_i, double a, double b, double c, double d, double ksi1, 
 }
 
 inline double I(int N_i, double(*function)(double, ...), double a, double b, double c, double d) {
-    //двумерный интеграл
+    //РґРІСѓРјРµСЂРЅС‹Р№ РёРЅС‚РµРіСЂР°Р»
     double h_i = (b - a) / N_i, h_j = (d - c) / N_i;
     double Sum = 0;
     for (size_t i = 0; i < N_i; i++) {
@@ -73,7 +73,7 @@ inline double I(int N_i, double(*function)(double, ...), double a, double b, dou
 }
 
 inline double I(int N_i, double a, double b) {
-    //одномерный интеграл
+    //РѕРґРЅРѕРјРµСЂРЅС‹Р№ РёРЅС‚РµРіСЂР°Р»
     double h_int = (b - a) / (N_i * 1.0);
     double Sum = 0.0;
     for (size_t i = 0; i < N_i; i++) {
