@@ -14,8 +14,8 @@ inline double k(double y1, ...) {
     x2 = va_arg(args, double);
     va_end(args);
 
-    return x1 + x2 - y1 * y2;
-    //return x1 - x2;
+    //return x1 + x2 - y1 * y2;
+    return x1 - x2;
 }
 
 inline double f(double x1, ...) {
@@ -25,8 +25,8 @@ inline double f(double x1, ...) {
     double x2 = va_arg(args, double);
     va_end(args);
 
-    return 1.0 / 3.0;
-    //return pow(x1, 2) - 1.0 * x1 / 3.0 + 1.0 / 4.0;
+    //return 1.0 / 3.0;
+    return pow(x1, 2) - 1.0 * x1 / 3.0 + 1.0 / 4.0;
 }
 
 inline double base_func(int i, int j) {
