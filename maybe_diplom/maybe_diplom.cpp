@@ -4,20 +4,17 @@
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
 
-const int n = 10, N = n * n;
+const int n = 2, N = n * n;
 
 double R = 5;
 double lambda = 1;
-
-//отрезок для одномерных интегральных уравнений
-//double A = 0, B = 1;
 
 //отрезок для двумерных интегральных уравнений
 double A = 0, B = 1;
 double C = 0, D = 1;
 
 //шаг для одномерных интегральных уравнений
-double h = (B - A) / (n-1);
+double h = (B - A) / n;
 
 //отрезок для двумерных интегральных уравнений
 double h1 = (B - A) / n, h2 = (D - C) / n;
@@ -70,6 +67,7 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
     //type - тип уравнения Фредгольма, первого или второго рода
     //dim_s - размер измерения в котором считается метод Галёркина
     size_t M = _msize(var) / sizeof(var[0]);
+    int m = (int)sqrt(M);
 
     if (dim_s == 1) {
         double(*function)(double, ...) = NULL;
@@ -88,12 +86,33 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
         }
     }
     else {
+        double(*function1)(double, ...) = NULL;
+        double(*function2)(double, ...) = NULL;
+        function1 = &k;
+        function2 = &f;
 
+        for (size_t i = 0; i < M; i++) {
+
+            short i1 = i / m, i2 = i % m;
+
+            double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
+            double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
+
+            for (size_t j = 0; j < M; j++) {
+                short j1 = j / m, j2 = j % m;
+
+                double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
+                double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
+
+                var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(100, function1, a, b, c, d, e, f, g, l);
+            }
+            var[i][M] = I(100, function2, a, b, c, d);
+        }
     }
 }
 
 
-int main()
+int main1()
 {
     double** a = createm(n, n + 1.0);
 
@@ -118,6 +137,46 @@ int main()
     {
         printf("%f\n", a[i][n]);
     }
+    return 0;
 }
 
 
+int main() {
+    double **a = createm(N, N + 1.0), **a1 = createm(N, N + 1.0);
+
+    mg(a, 2, 2);
+    mk(a1, 2, 2);
+
+   /* printf("mg\n");
+    print(a);
+    space(1);
+
+    printf("mk\n");
+    print(a1);
+    space(1);*/
+
+
+    cout << gm(a) << " " << gm(a1) << "\n";
+    space(1);
+
+    printf("mg\n");
+    for (size_t i = 0; i < N; i++)
+    {
+        if (i % n == 0 && i != 0) printf("\n");
+        printf("%f ", a[i][N]);
+        
+    }
+    space(1);
+
+    printf("mk\n");
+    for (size_t i = 0; i < N; i++)
+    {
+        /*short i1 = i / n, i2 = i % n;
+        double ksi1 = A + (i1 + 0.5) * h1, ksi2 = A + (i2 + 0.5) * h2;
+
+        printf("%f %f %f\n", ksi1, ksi2, a1[i][N]);*/
+        
+        if (i % n == 0 && i != 0) printf("\n");
+        printf("%f ", a1[i][N]);
+    }
+}
