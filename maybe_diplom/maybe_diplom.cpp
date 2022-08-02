@@ -34,20 +34,18 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
     int m = (int) sqrt(M);
 
     if(dim_s == 1)
-        for (size_t i = 0; i < M; i++)
-        {
+        for (size_t i = 0; i < M; i++){
             double ksi = A + (i + 0.5) * h;
 
             for (size_t j = 0; j < M; j++){
-            
                 double a = A + j * h, b = A + (j + 1.0) * h;
+                
                 var[i][j] = base_func(i, j) * (type - 1.0) - lambda * I_k(100, a, b, ksi);
             }
             var[i][M] = f(ksi);
         }
     else
         for (size_t i = 0; i < M; i++){
-
             short i1 = i / m, i2 = i % m;
             double ksi1 = A + (i1 + 0.5) * h1, ksi2 = A + (i2 + 0.5) * h2;
 
@@ -55,7 +53,7 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
                 short j1 = j / m, j2 = j % m;
                 double a = A + j1 * h1, b = A + (j1 + 1.0) * h1, c = C + j2 * h2, d = C + (j2 + 1.0) * h2;
 
-                var[i][j] = base_func(i, j) * (type - 1.0) - lambda * I_k(100, a, b, c, d, ksi1, ksi2);
+                var[i][j] = base_func(i, j) * (type - 1.0) - lambda * I_k(100, a, b, c, d, ksi1, ksi2);     
             }
             var[i][M] = f(ksi1, ksi2);
         }
@@ -74,12 +72,11 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
         function = &k;
 
         for (size_t i = 0; i < M; i++) {
-
             double a = A + i * h, b = A + (i + 1.0) * h;
 
             for (size_t j = 0; j < M; j++) {
-
                 double c = A + j * h, d = A + (j + 1.0) * h;
+
                 var[i][j] = h * base_func(i, j) * (type - 1.0) - lambda * I(100, function, a, b, c, d);
             }
             var[i][M] = I(100, a, b);
@@ -92,19 +89,18 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
         function2 = &f;
 
         for (size_t i = 0; i < M; i++) {
-
             short i1 = i / m, i2 = i % m;
-
             double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
             double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
 
+            printf("i=%d\n", i);
             for (size_t j = 0; j < M; j++) {
                 short j1 = j / m, j2 = j % m;
-
                 double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
-                var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(100, function1, a, b, c, d, e, f, g, l);
+                printf("j=%d\n", j);
+                var[j][i] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(100, function1, a, b, c, d, e, f, g, l);
             }
             var[i][M] = I(100, function2, a, b, c, d);
         }
@@ -144,16 +140,16 @@ int main1()
 int main() {
     double **a = createm(N, N + 1.0), **a1 = createm(N, N + 1.0);
 
-    mg(a, 2, 2);
-    mk(a1, 2, 2);
+    mg(a, 2.0, 2);
+    mk(a1, 2.0, 2);
 
-   /* printf("mg\n");
+    printf("mg\n");
     print(a);
     space(1);
 
     printf("mk\n");
     print(a1);
-    space(1);*/
+    space(1);
 
 
     cout << gm(a) << " " << gm(a1) << "\n";

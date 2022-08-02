@@ -14,6 +14,7 @@ inline double k(double y1, ...) {
     x2 = va_arg(args, double);
     va_end(args);
 
+
     return x1 + x2 - y1 * y2;
     //return y1 + y2 - x1 * x2;
     //return y1 - y2;
@@ -25,12 +26,14 @@ inline double f(double x1, ...) {
     double x2 = va_arg(args, double);
     va_end(args);
 
+    //return sin(10.0 * x1 + 10.0 * x2) + (1.0 / 10000.0) * (200.0 * x1 + 200.0 * x2 + 2.0) * sin(10.0) + (1.0 / 10000.0) * (-100.0 * x1 - 100.0 * x2 + 99.0) * sin(20.0) - (1.0 / 500.0) * cos(10.0) + (1.0 / 500.0) * cos(20.0);
+    //return 1.0 / 6.0 - (1.0 / 2.0) * sin(1.0) + (1.0 / 2.0) * cos(1.0) + (1.0 / 2.0) * x1 - (1.0 / 2.0) * x2 - cos(1.0) * x1 - cos(1.0) * x2 + sin(x1);
     return 1.0 / 3.0;
     //return pow(x1, 2) - 1.0 * x1 / 3.0 + 1.0 / 4.0;
 }
 
 inline double base_func(int i, int j) {
-    return i == j ? 1 : 0;
+    return i == j ? 1.0 : 0.0;
 }
 
 
