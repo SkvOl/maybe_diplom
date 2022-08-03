@@ -24,7 +24,6 @@ inline double u(double y1) {
     return y1 * y1;
 }
 
-
 void mk(double**& var, size_t type, size_t dim_s = 1) {
     //метод Коллокаций
     //var - матрица, в которую будут записываться данные 
@@ -105,35 +104,6 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
             var[i][M] = I(100, function2, a, b, c, d);
         }
     }
-}
-
-
-int main1()
-{
-    double** a = createm(n, n + 1.0);
-
-    //mk(a, 2, 2);
-    mg(a, 2);
-
-    cout << gm(a) << "\n";
-
-    //print(a);
-
-    space(1);
-
-    /*for (size_t i = 0; i < N; i++)
-    {
-        short i1 = i / n, i2 = i % n;
-        double ksi1 = A + (i1 + 0.5) * h1, ksi2 = A + (i2 + 0.5) * h2;
-        
-        printf("%f %f %f\n", ksi1, ksi2, a[i][N]);
-    }*/
-
-    for (size_t i = 0; i < n; i++)
-    {
-        printf("%f\n", a[i][n]);
-    }
-    return 0;
 }
 
 
