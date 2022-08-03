@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdarg.h>
 
+double mach_eps = 2.22045e-16;
+
 inline double k(double y1, ...) {
     double y2, x1, x2;
     va_list args;
