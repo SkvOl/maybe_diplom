@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdarg.h>
 
-double mach_eps = 2.22045e-16;
+double mach_eps = sqrt(2.22045e-16);
 
 inline double k(double y1, ...) {
     double y2, x1, x2;
@@ -38,6 +38,10 @@ inline double base_func(int i, int j) {
     return i == j ? 1.0 : 0.0;
 }
 
+inline void grad(double(*function)(double, ...), double*& res, double x1, double x2) {
+    res[0] = ((*function)(x1 * (1 + mach_eps), x2) - (*function)(x1 * (1 - mach_eps), x2)) / 2.0 / x1 / mach_eps;
+    res[1] = ((*function)(x1, x2 * (1 + mach_eps)) - (*function)(x1, x2 * (1 - mach_eps))) / 2.0 / x2 / mach_eps;
+}
 
 
 inline double I_k(int N_i, double a, double b, double ksi) {
