@@ -1,5 +1,6 @@
 ﻿#include "matrix.h"
 #include "integrals.h"
+#include <mpi.h>
 
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
@@ -58,27 +59,29 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
         }
 }
 
-void mg(double**& var, size_t type, size_t dim_s = 1) {
+void mg(double**& var, size_t type, size_t dim_s = 1, int _step = 0) {
     //метод Галёркина
     //var - матрица, в которую будут записываться данные 
     //type - тип уравнения Фредгольма, первого или второго рода
     //dim_s - размер измерения в котором считается метод Галёркина
     size_t M = _msize(var) / sizeof(var[0]);
-    int m = (int)sqrt(M);
+    size_t N = _msize(var[0]) / sizeof(var[0][0]);
+
+    int m = (int)sqrt(N - 1);
 
     if (dim_s == 1) {
         double(*function)(double, ...) = NULL;
         function = &k;
 
         for (size_t i = 0; i < M; i++) {
-            double a = A + i * h, b = A + (i + 1.0) * h;
+            double a = A + (i + _step) * h, b = A + ((i + _step) + 1.0) * h;
 
-            for (size_t j = 0; j < M; j++) {
+            for (size_t j = 0; j < N - 1; j++) {
                 double c = A + j * h, d = A + (j + 1.0) * h;
 
-                var[i][j] = h * base_func(i, j) * (type - 1.0) - lambda * I(100, function, a, b, c, d);
+                var[i][j] = h * base_func(i + _step, j) * (type - 1.0) - lambda * I(100, function, a, b, c, d);
             }
-            var[i][M] = I(100, a, b);
+            var[i][N - 1] = I(100, a, b);
         }
     }
     else {
@@ -87,62 +90,62 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
         function1 = &k;
         function2 = &f;
 
-        for (size_t i = 0; i < M; i++) {
+        for (size_t i = 0; i < N - 1; i++) {
             short i1 = i / m, i2 = i % m;
             double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
             double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
 
-            printf("i=%d\n", i);
             for (size_t j = 0; j < M; j++) {
-                short j1 = j / m, j2 = j % m;
+                short j1 = (j + _step) / m, j2 = (j + _step) % m;
                 double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
-                printf("j=%d\n", j);
-                var[j][i] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(100, function1, a, b, c, d, e, f, g, l);
+                var[j][i] = h1 * h2 * base_func(i, j + _step) * (type - 1.0) - lambda * I(100, function1, a, b, c, d, e, f, g, l);
+                if (i == 0) var[j][N - 1] = I(100, function2, a, b, c, d);
             }
-            var[i][M] = I(100, function2, a, b, c, d);
         }
     }
 }
 
 
 int main() {
-    double **a = createm(N, N + 1.0), **a1 = createm(N, N + 1.0);
+    int _rank, _size;
+    
+    MPI_Init(NULL, NULL);
+    MPI_Comm_size(MPI_COMM_WORLD, &_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+    MPI_Status status;
+    MPI_Request request;
 
-    mg(a, 2.0, 2);
-    mk(a1, 2.0, 2);
+    /// подготовительные работы
+    short* count_one_rank = (short*)malloc(_size * sizeof(short));
+    for (size_t i = 0; i < _size; i++)
+        count_one_rank[i] = N / _size;
 
-    printf("mg\n");
+    short mod = N % _size;
+    if(mod != 0)
+        for (short i = _size - 1; i >= 0; i--) {
+            count_one_rank[i]++;
+            mod--;
+            if (mod == 0) break;
+        }
+
+    int _step = 0;
+    for (size_t i = 0; i < _rank; i++)
+        _step += count_one_rank[i];
+    /// подготовительные работы
+
+    double** a = createm(count_one_rank[_rank], N + 1);
+
+    double t1 = MPI_Wtime();
+    mg(a, 2, 2, _step);
+    double t2 = MPI_Wtime() - t1;
+
+    printf("rank: %d  time is: %f\n", _rank, t2);
+    fflush(stdout);
     print(a);
-    space(1);
+    space(2);
 
-    printf("mk\n");
-    print(a1);
-    space(1);
-
-
-    cout << gm(a) << " " << gm(a1) << "\n";
-    space(1);
-
-    printf("mg\n");
-    for (size_t i = 0; i < N; i++)
-    {
-        if (i % n == 0 && i != 0) printf("\n");
-        printf("%f ", a[i][N]);
-        
-    }
-    space(1);
-
-    printf("mk\n");
-    for (size_t i = 0; i < N; i++)
-    {
-        /*short i1 = i / n, i2 = i % n;
-        double ksi1 = A + (i1 + 0.5) * h1, ksi2 = A + (i2 + 0.5) * h2;
-
-        printf("%f %f %f\n", ksi1, ksi2, a1[i][N]);*/
-        
-        if (i % n == 0 && i != 0) printf("\n");
-        printf("%f ", a1[i][N]);
-    }
+    
+    MPI_Finalize();
 }
