@@ -5,7 +5,7 @@
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
 
-const int n = 2, N = n * n;
+const int _n = 5, _N = _n * _n;
 
 double R = 5;
 double lambda = 1;
@@ -15,10 +15,10 @@ double A = 0, B = 1;
 double C = 0, D = 1;
 
 //шаг для одномерных интегральных уравнений
-double h = (B - A) / n;
+double h = (B - A) / _n;
 
 //отрезок для двумерных интегральных уравнений
-double h1 = (B - A) / n, h2 = (D - C) / n;
+double h1 = (B - A) / _n, h2 = (D - C) / _n;
 
 
 inline double u(double y1) {     
@@ -94,13 +94,15 @@ void mg(double**& var, size_t type, size_t dim_s = 1, int _step = 0) {
             short i1 = i / m, i2 = i % m;
             double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
             double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
+            /*printf("i=%d\n", i);
+            fflush(stdout);*/
 
             for (size_t j = 0; j < M; j++) {
                 short j1 = (j + _step) / m, j2 = (j + _step) % m;
                 double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
-                var[j][i] = h1 * h2 * base_func(i, j + _step) * (type - 1.0) - lambda * I(100, function1, a, b, c, d, e, f, g, l);
+                var[j][i] = h1 * h2 * base_func(i, j + _step) * (type - 1.0) - lambda * I(10, function1, a, b, c, d, e, f, g, l);
                 if (i == 0) var[j][N - 1] = I(100, function2, a, b, c, d);
             }
         }
@@ -118,11 +120,11 @@ int main() {
     MPI_Request request;
 
     /// подготовительные работы
-    short* count_one_rank = (short*)malloc(_size * sizeof(short));
+    int* count_one_rank = (int*)malloc(_size * sizeof(int));
     for (size_t i = 0; i < _size; i++)
-        count_one_rank[i] = N / _size;
+        count_one_rank[i] = _N / _size;
 
-    short mod = N % _size;
+    short mod = _N % _size;
     if(mod != 0)
         for (short i = _size - 1; i >= 0; i--) {
             count_one_rank[i]++;
@@ -135,17 +137,50 @@ int main() {
         _step += count_one_rank[i];
     /// подготовительные работы
 
-    double** a = createm(count_one_rank[_rank], N + 1);
+    double** a = createm(count_one_rank[_rank], _N + 1);
 
     double t1 = MPI_Wtime();
     mg(a, 2, 2, _step);
     double t2 = MPI_Wtime() - t1;
+    /*printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
+    fflush(stdout);*/
 
-    printf("rank: %d  time is: %f\n", _rank, t2);
-    fflush(stdout);
-    print(a);
-    space(2);
+    t1 = MPI_Wtime();
+    gm(a, count_one_rank, _step, _rank, _size);
+    t2 = MPI_Wtime() - t1;
+    /*printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
+    fflush(stdout);*/
+    
+    double* part_res = createv(count_one_rank[_rank]), * res = NULL;
+    int* arr_step = NULL;
 
     
+    for (size_t i = 0; i < count_one_rank[_rank]; i++)
+        part_res[i] = a[i][_N];
+    
+    
+    if (_rank == 0) {
+        del(a);
+
+        res = createv(_N);
+        arr_step = (int*)malloc(_size * sizeof(int));
+
+        for (size_t i = 0; i < _size; i++) {
+            arr_step[i] = 0;
+
+            for (size_t j = 0; j < i; j++)
+                arr_step[i] += count_one_rank[j];
+        }
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE, res, count_one_rank, arr_step, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    if (_rank == 0) 
+        for (size_t i = 0; i < _N; i++) {
+            if (i % _n == 0 && i != 0) printf("\n");
+            printf("%f ", res[i]);
+        }  
+
+
     MPI_Finalize();
 }
