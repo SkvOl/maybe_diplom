@@ -176,10 +176,14 @@ string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank =
             }
         }
         else if (_k < _step) {
+            size_t step = 0, head_rank = 0;
+            for (head_rank = 0; head_rank < _size; head_rank++) {
+                step += count_one_rank[head_rank];
+                if (_k < step) break;
+            }
+            
             type_gm* _kvar = createv<type_gm>(N);
-            MPI_Recv(_kvar, N, type, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
-            /*printf("rank=%d k=%d sourse=%d\n", _rank, _k, status.MPI_SOURCE);
-            print(_kvar);*/
+            MPI_Recv(_kvar, N, type, head_rank, 1, MPI_COMM_WORLD, &status);
 
             for (size_t i = 0; i < M; i++) {
                 type_gm T = var[i][_k];
