@@ -71,12 +71,16 @@ inline void print(type_matrix_print** var, string c = "") {
                 if (c == "r" || c == "R")SetConsoleTextAttribute(hConsoleHandle, FOREGROUND_RED);
                 if (c == "i" || c == "I")SetConsoleTextAttribute(hConsoleHandle, FOREGROUND_INTENSITY);
 
-                type != "complex" ? printf(type, var[i][j]) : printf("%f+%fi ", var[i][j].real(), var[i][j].imag());
+                if (type != "complex") printf(type, var[i][j]);
+                else cout << var[i][j] << " ";
+
                 fflush(stdout);
                 SetConsoleTextAttribute(hConsoleHandle, 15);
             }
             else {
-                type != "complex" ? printf(type, var[i][j]) : printf("%f+%fi ", var[i][j].real(), var[i][j].imag());
+                if (type != "complex") printf(type, var[i][j]);
+                else cout << var[i][j] << " ";
+
                 fflush(stdout);
             }
 
@@ -100,7 +104,8 @@ inline void print(type_vector_print* var) {
     
     for (size_t i = 0; i < M; i++)
     {
-        type != "complex" ? printf(type, var[i]) : printf("%f+%fi\n", var[i].real(), var[i].imag());
+        if (type != "complex") printf(type, var[i]);
+        else cout << var[i] << "\n";
         fflush(stdout);
     }
     printf("\n");
@@ -147,10 +152,10 @@ string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank =
 
 
     for (size_t _k = 0; _k < N - 1; _k++) {
-        double ed = 1;
+        type_gm ed = 1;
         if(_k >= _step && _k < _step + count_one_rank[_rank]) {
             if (var[_k - _step][_k] != ed) {
-                double T = var[_k - _step][_k];
+                type_gm T = var[_k - _step][_k];
                 for (size_t j = _k; j < N; j++) {
                     var[_k - _step][j] = var[_k - _step][j] / T;
                 }
@@ -164,7 +169,7 @@ string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank =
 
             for (size_t i = _k - _step; i < M; i++) {
                 if ((var[i][_k] != ed) && (i != _k - _step)) {
-                    double T = var[i][_k];
+                    type_gm T = var[i][_k];
                     var[i][_k] = 0;
                     for (size_t j = _k + 1; j < N; j++) {
                         var[i][j] -= var[_k - _step][j] * T;
@@ -191,13 +196,13 @@ string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank =
     
     //обратный ход
     int M_in;
-    double* f_in = NULL, *f_out = createv<double>(M);
+    type_gm* f_in = NULL, *f_out = createv<type_gm>(M);
     if (_rank != _size - 1) {
         int step = 0;
         for (size_t _i = 0; _i < _size - 1 - _rank; _i++) {
             MPI_Probe(MPI_ANY_SOURCE, 2, MPI_COMM_WORLD, &status);
             MPI_Get_count(&status, type, &M_in);
-            f_in = createv<double>(M_in);
+            f_in = createv<type_gm>(M_in);
             MPI_Recv(f_in, M_in, type, MPI_ANY_SOURCE, 2, MPI_COMM_WORLD, &status);
             for (int i = M - 1; i >= 0; i--) {
                 step = 0;
