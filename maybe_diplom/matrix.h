@@ -153,16 +153,14 @@ string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank =
 
     for (size_t _k = 0; _k < N - 1; _k++) {
         type_gm ed = 1;
-        if(_k >= _step && _k < _step + count_one_rank[_rank]) {
+        if (_k >= _step && _k < _step + count_one_rank[_rank]) {
             if (var[_k - _step][_k] != ed) {
                 type_gm T = var[_k - _step][_k];
                 for (size_t j = _k; j < N; j++) {
                     var[_k - _step][j] = var[_k - _step][j] / T;
                 }
             }
-            for (size_t i = 0; i < _size; i++) {
-                if(i != _rank) MPI_Send(&_rank, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-            }
+            
             for (size_t i = _rank + 1; i < _size; i++) {
                 MPI_Send(var[_k - _step], N, type, i, 1, MPI_COMM_WORLD);
             }
@@ -177,19 +175,17 @@ string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank =
                 }
             }
         }
-        else{
-            int head_rank;
-            MPI_Recv(&head_rank, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
-            if (_rank > head_rank) {
-                double* _kvar = createv<double>(N);
-                MPI_Recv(_kvar, N, type, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
-                for (size_t i = 0; i < M; i++) {
-                    double T = var[i][_k];
-                    var[i][_k] = 0;
-                    for (size_t j = _k + 1; j < N; j++) {
-                        var[i][j] -= _kvar[j] * T;
-                    }
-                }
+        else if (_k < _step) {
+            type_gm* _kvar = createv<type_gm>(N);
+            MPI_Recv(_kvar, N, type, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
+            /*printf("rank=%d k=%d sourse=%d\n", _rank, _k, status.MPI_SOURCE);
+            print(_kvar);*/
+
+            for (size_t i = 0; i < M; i++) {
+                type_gm T = var[i][_k];
+                var[i][_k] = 0;
+                for (size_t j = _k + 1; j < N; j++)
+                    var[i][j] -= _kvar[j] * T;
             }
         }
     }

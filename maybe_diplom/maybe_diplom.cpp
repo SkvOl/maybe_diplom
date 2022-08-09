@@ -143,14 +143,14 @@ int main() {
     double t1 = MPI_Wtime();
     mg(a, 2, 2, _step);
     double t2 = MPI_Wtime() - t1;
-    printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
-    fflush(stdout);
+    /*printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
+    fflush(stdout);*/
 
     t1 = MPI_Wtime();
     gm(a, count_one_rank, _step, _rank, _size);
     t2 = MPI_Wtime() - t1;
-    printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
-    fflush(stdout);
+    /*printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
+    fflush(stdout);*/
     
     double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
     int* arr_step = NULL;
