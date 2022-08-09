@@ -1,6 +1,6 @@
 ﻿#include "matrix.h"
 #include "integrals.h"
-#include <mpi.h>
+
 
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
@@ -120,7 +120,8 @@ int main() {
     MPI_Request request;
 
     /// подготовительные работы
-    int* count_one_rank = (int*)malloc(_size * sizeof(int));
+    int* count_one_rank = createv<int>(_size);
+
     for (size_t i = 0; i < _size; i++)
         count_one_rank[i] = _N / _size;
 
@@ -137,21 +138,21 @@ int main() {
         _step += count_one_rank[i];
     /// подготовительные работы
 
-    double** a = createm(count_one_rank[_rank], _N + 1);
+    double** a = createm<double>(count_one_rank[_rank], _N + 1);
 
     double t1 = MPI_Wtime();
     mg(a, 2, 2, _step);
     double t2 = MPI_Wtime() - t1;
-    /*printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
-    fflush(stdout);*/
+    printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
+    fflush(stdout);
 
     t1 = MPI_Wtime();
     gm(a, count_one_rank, _step, _rank, _size);
     t2 = MPI_Wtime() - t1;
-    /*printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
-    fflush(stdout);*/
+    printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
+    fflush(stdout);
     
-    double* part_res = createv(count_one_rank[_rank]), * res = NULL;
+    double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
     int* arr_step = NULL;
 
     
@@ -162,8 +163,8 @@ int main() {
     if (_rank == 0) {
         del(a);
 
-        res = createv(_N);
-        arr_step = (int*)malloc(_size * sizeof(int));
+        res = createv<double>(_N);
+        arr_step = createv<int>(_size);
 
         for (size_t i = 0; i < _size; i++) {
             arr_step[i] = 0;

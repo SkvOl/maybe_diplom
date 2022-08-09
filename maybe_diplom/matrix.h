@@ -10,18 +10,20 @@
 #include <string>
 #include <math.h>
 #include <mpi.h>
+#include <complex>
 
 using namespace std;
 
 
-double** createm(size_t M, size_t N, bool mod = false) {
+template<class type_matrix>
+inline type_matrix** createm(size_t M, size_t N, bool mod = false) {
     //выделение пам€ти под указатель
     //mod - нужноли при создании создавать единичную матрицу
 
-    double** var = (double**)malloc(M * sizeof(double*));
-    for (int i = 0; i < M; i++)
-        var[i] = (double*)malloc(N * sizeof(double));
-    
+    type_matrix** var = (type_matrix**)malloc(M * sizeof(type_matrix*));
+    for (size_t i = 0; i < M; i++)
+        var[i] = (type_matrix*)malloc(N * sizeof(type_matrix));
+
 
 
     if (mod)
@@ -33,10 +35,11 @@ double** createm(size_t M, size_t N, bool mod = false) {
     return var;
 }
 
-double* createv(size_t N, bool mod = false) {
+template<class type_vector>
+inline type_vector* createv(size_t N, bool mod = false) {
     //выделение пам€ти под указатель
     //mod - нужноли при создании создавать единичный вектор
-    double* var = (double*)malloc(N * sizeof(double));
+    type_vector* var = (type_vector*)malloc(N * sizeof(type_vector));
 
     if (mod)
         for (size_t i = 0; i < N; i++)
@@ -45,11 +48,17 @@ double* createv(size_t N, bool mod = false) {
     return var;
 }
 
-inline void print(double** var, string c = "") {
+template<class type_matrix_print>
+inline void print(type_matrix_print** var, string c = "") {
     //вывод указател€ var в консоль
     //c (color) - цвет главной диагонали при выводе на экран: G, g - зелЄный, B, b - синий, R, r - красный, I,i - интенсивнее серого
     size_t M = _msize(var) / sizeof(var[0]);
     size_t N = _msize(var[0]) / sizeof(var[0][0]);
+
+    const char* type = "";
+    if (sizeof(type_matrix_print) == sizeof(int))  type = "%d ";
+    if (sizeof(type_matrix_print) == sizeof(double))  type = "%f ";
+    if (sizeof(type_matrix_print) == sizeof(complex<double>))  type = "complex";
 
     HANDLE hConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     for (size_t i = 0; i < M; i++)
@@ -62,12 +71,12 @@ inline void print(double** var, string c = "") {
                 if (c == "r" || c == "R")SetConsoleTextAttribute(hConsoleHandle, FOREGROUND_RED);
                 if (c == "i" || c == "I")SetConsoleTextAttribute(hConsoleHandle, FOREGROUND_INTENSITY);
 
-                printf("%4.*f ", 3, var[i][j]);
+                type != "complex" ? printf(type, var[i][j]) : printf("%f+%fi ", var[i][j].real(), var[i][j].imag());
                 fflush(stdout);
                 SetConsoleTextAttribute(hConsoleHandle, 15);
             }
             else {
-                printf("%4.*f ", 3, var[i][j]);
+                type != "complex" ? printf(type, var[i][j]) : printf("%f+%fi ", var[i][j].real(), var[i][j].imag());
                 fflush(stdout);
             }
 
@@ -79,13 +88,19 @@ inline void print(double** var, string c = "") {
     fflush(stdout);
 }
 
-inline void print(double* var) {
+template<class type_vector_print>
+inline void print(type_vector_print* var) {
     //вывод указател€ var в консоль
     size_t M = _msize(var) / sizeof(var[0]);
+
+    const char* type = "";
+    if (sizeof(type_vector_print) == sizeof(int))  type = "%d\n";
+    if (sizeof(type_vector_print) == sizeof(double))  type = "%f\n";
+    if (sizeof(type_vector_print) == sizeof(complex<double>))  type = "complex";
     
     for (size_t i = 0; i < M; i++)
     {
-        printf("%f\n", var[i]);
+        type != "complex" ? printf(type, var[i]) : printf("%f+%fi\n", var[i].real(), var[i].imag());
         fflush(stdout);
     }
     printf("\n");
@@ -101,7 +116,8 @@ void space(size_t k = 0) {
     }
 }
 
-int size(double **var) {
+template<class type_matrix_size>
+int size(type_matrix_size**var) {
     //вычисл€ет объЄм занимаемой пам€ти указателем var
     size_t M = _msize(var) / sizeof(var[0]);
     size_t sum = 0;
@@ -110,17 +126,25 @@ int size(double **var) {
     return sum;
 }
 
-int size(double* var) {
+template<class type_vector_size>
+int size(type_vector_size* var) {
     //вычисл€ет объЄм занимаемой пам€ти указателем var
     return _msize(var);
 }
 
-string gm(double**& var, int* count_one_rank = NULL, int _step = 0, int _rank = 0, int _size = 0) {
+template<class type_gm>
+string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank = 0, int _size = 0) {
     //метод √аусса
     MPI_Status status;
     MPI_Request request;
     size_t M = _msize(var) / sizeof(var[0]);
     size_t N = _msize(var[0]) / sizeof(var[0][0]);
+    MPI_Datatype type;
+
+    if (sizeof(type_gm) == sizeof(int))  type = MPI_INT;
+    if (sizeof(type_gm) == sizeof(double))  type = MPI_DOUBLE;
+    if (sizeof(type_gm) == sizeof(complex<double>))  type = MPI_DOUBLE_COMPLEX;
+
 
     for (size_t _k = 0; _k < N - 1; _k++) {
         double ed = 1;
@@ -135,7 +159,7 @@ string gm(double**& var, int* count_one_rank = NULL, int _step = 0, int _rank = 
                 if(i != _rank) MPI_Send(&_rank, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
             }
             for (size_t i = _rank + 1; i < _size; i++) {
-                MPI_Send(var[_k - _step], N, MPI_DOUBLE, i, 1, MPI_COMM_WORLD);
+                MPI_Send(var[_k - _step], N, type, i, 1, MPI_COMM_WORLD);
             }
 
             for (size_t i = _k - _step; i < M; i++) {
@@ -152,8 +176,8 @@ string gm(double**& var, int* count_one_rank = NULL, int _step = 0, int _rank = 
             int head_rank;
             MPI_Recv(&head_rank, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
             if (_rank > head_rank) {
-                double* _kvar = createv(N);
-                MPI_Recv(_kvar, N, MPI_DOUBLE, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
+                double* _kvar = createv<double>(N);
+                MPI_Recv(_kvar, N, type, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
                 for (size_t i = 0; i < M; i++) {
                     double T = var[i][_k];
                     var[i][_k] = 0;
@@ -167,14 +191,14 @@ string gm(double**& var, int* count_one_rank = NULL, int _step = 0, int _rank = 
     
     //обратный ход
     int M_in;
-    double* f_in = NULL, *f_out = createv(M);
+    double* f_in = NULL, *f_out = createv<double>(M);
     if (_rank != _size - 1) {
         int step = 0;
         for (size_t _i = 0; _i < _size - 1 - _rank; _i++) {
             MPI_Probe(MPI_ANY_SOURCE, 2, MPI_COMM_WORLD, &status);
-            MPI_Get_count(&status, MPI_DOUBLE, &M_in);
-            f_in = createv(M_in);
-            MPI_Recv(f_in, M_in, MPI_DOUBLE, MPI_ANY_SOURCE, 2, MPI_COMM_WORLD, &status);
+            MPI_Get_count(&status, type, &M_in);
+            f_in = createv<double>(M_in);
+            MPI_Recv(f_in, M_in, type, MPI_ANY_SOURCE, 2, MPI_COMM_WORLD, &status);
             for (int i = M - 1; i >= 0; i--) {
                 step = 0;
                 for (size_t i = _size - 1; i > status.MPI_SOURCE; i--)
@@ -209,7 +233,7 @@ string gm(double**& var, int* count_one_rank = NULL, int _step = 0, int _rank = 
             
     if (_rank != 0)
         for (int i = _rank - 1; i >= 0; i--)
-            MPI_Send(f_out, M, MPI_DOUBLE, i, 2, MPI_COMM_WORLD);
+            MPI_Send(f_out, M, type, i, 2, MPI_COMM_WORLD);
         
 
     //обратный ход
@@ -218,7 +242,8 @@ string gm(double**& var, int* count_one_rank = NULL, int _step = 0, int _rank = 
     return "rank: " + to_string(_rank) + "  Successfully";
 }
 
-void del(double**& var) {
+template<class type_matrix_del>
+void del(type_matrix_del**& var) {
     //очистка пам€ти указател€ var
     size_t M = _msize(var) / sizeof(var[0]);
     
@@ -226,6 +251,7 @@ void del(double**& var) {
     free(var);
 }
 
+template<class type_vector_del>
 void del(double*& var) {
     //очистка пам€ти указател€ var
     free(var);
