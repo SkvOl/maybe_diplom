@@ -110,7 +110,7 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
 
 int main1()
 {
-    double** a = createm(n, n + 1.0);
+    double** a = createm<double>(n, n + 1.0);
 
     //mk(a, 2, 2);
     mg(a, 2);
@@ -138,7 +138,7 @@ int main1()
 
 
 int main() {
-    double **a = createm(N, N + 1.0), **a1 = createm(N, N + 1.0);
+    double **a = createm<double>(N, N + 1.0), **a1 = createm<double>(N, N + 1.0);
 
     mg(a, 2.0, 2);
     mk(a1, 2.0, 2);
