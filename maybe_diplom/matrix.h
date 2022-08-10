@@ -55,8 +55,8 @@ inline void print(type_matrix_print** var, string c = "") {
     size_t N = _msize(var[0]) / sizeof(var[0][0]);
 
     const char* type = "";
-    if (sizeof(type_matrix_print) == sizeof(int))  type = "%d\n";
-    if (sizeof(type_matrix_print) == sizeof(double))  type = "%f\n";
+    if (sizeof(type_matrix_print) == sizeof(int))  type = "%d ";
+    if (sizeof(type_matrix_print) == sizeof(double))  type = "%f ";
     if (sizeof(type_matrix_print) == sizeof(complex<double>))  type = "complex";
 
     HANDLE hConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);

@@ -4,7 +4,7 @@
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
 
-const int n = 2, N = n * n;
+const int n = 10, N = n * n;
 
 double R = 5;
 double lambda = 1;
@@ -100,7 +100,7 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
                 printf("j=%d\n", j);
-                var[j][i] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(100, function1, a, b, c, d, e, f, g, l);
+                var[j][i] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(10, function1, a, b, c, d, e, f, g, l);
             }
             var[i][M] = I(100, function2, a, b, c, d);
         }
