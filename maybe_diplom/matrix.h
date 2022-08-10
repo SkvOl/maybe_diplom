@@ -162,7 +162,7 @@ string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank =
             }
             
             for (size_t i = _rank + 1; i < _size; i++) {
-                MPI_Send(var[_k - _step], N, type, i, 1, MPI_COMM_WORLD);
+                MPI_Ssend(var[_k - _step], N, type, i, 1, MPI_COMM_WORLD);
             }
 
             for (size_t i = _k - _step; i < M; i++) {
