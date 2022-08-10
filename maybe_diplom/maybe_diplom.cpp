@@ -5,7 +5,7 @@
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
 
-const int _n = 5, _N = _n * _n;
+const int _n = 10, _N = _n * _n;
 
 double R = 5;
 double lambda = 1;
@@ -103,8 +103,8 @@ void mg(double**& var, size_t type, size_t dim_s = 1, int _step = 0) {
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
                 var[j][i] = h1 * h2 * base_func(i, j + _step) * (type - 1.0) - lambda * I(10, function1, a, b, c, d, e, f, g, l);
-                if (i == 0) var[j][N - 1] = I(100, function2, a, b, c, d);
-            }
+                var[j][N - 1] = I(100, function2, e, f, g, l);
+            } 
         }
     }
 }
@@ -145,12 +145,14 @@ int main() {
     double t2 = MPI_Wtime() - t1;
     /*printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
     fflush(stdout);*/
+    //print(a);
 
     t1 = MPI_Wtime();
     gm(a, count_one_rank, _step, _rank, _size);
     t2 = MPI_Wtime() - t1;
     /*printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
     fflush(stdout);*/
+    
     
     double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
     int* arr_step = NULL;
