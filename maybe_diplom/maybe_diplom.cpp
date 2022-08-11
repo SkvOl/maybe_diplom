@@ -90,21 +90,19 @@ void mg(double**& var, size_t type, size_t dim_s = 1, int _step = 0) {
         function1 = &k;
         function2 = &f;
 
-        for (size_t i = 0; i < N - 1; i++) {
-            short i1 = i / m, i2 = i % m;
-            double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
-            double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
-            /*printf("i=%d\n", i);
-            fflush(stdout);*/
+        for (size_t j = 0; j < M; j++) {
+            short j1 = (j + _step) / m, j2 = (j + _step) % m;
+            double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
+            double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
-            for (size_t j = 0; j < M; j++) {
-                short j1 = (j + _step) / m, j2 = (j + _step) % m;
-                double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
-                double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
+            for (size_t i = 0; i < N - 1; i++) {
+                short i1 = i / m, i2 = i % m;
+                double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
+                double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
 
                 var[j][i] = h1 * h2 * base_func(i, j + _step) * (type - 1.0) - lambda * I(10, function1, a, b, c, d, e, f, g, l);
-                var[j][N - 1] = I(100, function2, e, f, g, l);
-            } 
+            }
+            var[j][N - 1] = I(100, function2, e, f, g, l);
         }
     }
 }
