@@ -146,9 +146,9 @@ string gm(type_gm**& var) {
     if (M + 1 != N) return "Error";
 
     for (size_t k = 0; k < M; k++) {
-        if (k == 0) printf("\nk=%i\n", k);
+       /* if (k == 0) printf("\nk=%i\n", k);
         if (k != 0) printf("k=%i\n", k);
-        fflush(stdout);
+        fflush(stdout);*/
         type_gm ed = 1;
         if (var[k][k] != ed) {
             type_gm T = var[k][k];

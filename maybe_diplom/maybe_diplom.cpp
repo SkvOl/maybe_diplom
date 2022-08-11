@@ -1,10 +1,12 @@
 ﻿#include "matrix.h"
 #include "integrals.h"
+#include <stdio.h> 
+#include <time.h> 
 
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
 
-const int n = 10, N = n * n;
+const int n = 50, N = n * n;
 
 double R = 5;
 double lambda = 1;
@@ -93,13 +95,13 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
             double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
             double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
 
-            printf("i=%d\n", i);
+            //printf("i=%d\n", i);
             for (size_t j = 0; j < M; j++) {
                 short j1 = j / m, j2 = j % m;
                 double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
-                printf("j=%d\n", j);
+                //printf("j=%d\n", j);
                 var[j][i] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(10, function1, a, b, c, d, e, f, g, l);
             }
             var[i][M] = I(100, function2, a, b, c, d);
@@ -139,20 +141,29 @@ int main1()
 
 int main() {
     double **a = createm<double>(N, N + 1.0), **a1 = createm<double>(N, N + 1.0);
+    time_t start1, end1, start2, end2;
 
+
+    time(&start1);
     mg(a, 2.0, 2);
+    time(&end1);
+    
     mk(a1, 2.0, 2);
 
-    printf("mg\n");
-    print(a);
-    space(1);
+    //printf("mg\n");
+    //print(a);
+    //space(1);
 
-    printf("mk\n");
-    print(a1);
-    space(1);
+    //printf("mk\n");
+    //print(a1);
+    //space(1);
 
+    time(&start2);
+    gm(a);
+    time(&end2);
 
-    cout << gm(a) << " " << gm(a1) << "\n";
+    gm(a1);
+
     space(1);
 
     printf("mg\n");
@@ -175,4 +186,7 @@ int main() {
         if (i % n == 0 && i != 0) printf("\n");
         printf("%f ", a1[i][N]);
     }
+
+    double time1 = difftime(end1, start1), time2 = difftime(end2, start2);
+    printf("\nTime is: %f\n", time1 + time2);
 }
