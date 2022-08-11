@@ -44,7 +44,7 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
                 
                 var[i][j] = base_func(i, j) * (type - 1.0) - lambda * I_k(100, a, b, ksi);
             }
-            var[i][M] = f(ksi);
+            var[i][M] = func(ksi);
         }
     else
         for (size_t i = 0; i < M; i++){
@@ -57,7 +57,7 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
 
                 var[i][j] = base_func(i, j) * (type - 1.0) - lambda * I_k(100, a, b, c, d, ksi1, ksi2);     
             }
-            var[i][M] = f(ksi1, ksi2);
+            var[i][M] = func(ksi1, ksi2);
         }
 }
 
@@ -70,26 +70,18 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
     int m = (int)sqrt(M);
 
     if (dim_s == 1) {
-        double(*function)(double, ...) = NULL;
-        function = &k;
-
         for (size_t i = 0; i < M; i++) {
             double a = A + i * h, b = A + (i + 1.0) * h;
 
             for (size_t j = 0; j < M; j++) {
                 double c = A + j * h, d = A + (j + 1.0) * h;
 
-                var[i][j] = h * base_func(i, j) * (type - 1.0) - lambda * I(100, function, a, b, c, d);
+                var[i][j] = h * base_func(i, j) * (type - 1.0) - lambda * I(100, k, a, b, c, d);
             }
             var[i][M] = I(100, a, b);
         }
     }
     else {
-        double(*function1)(double, ...) = NULL;
-        double(*function2)(double, ...) = NULL;
-        function1 = &k;
-        function2 = &f;
-
         for (size_t i = 0; i < M; i++) {
             short i1 = i / m, i2 = i % m;
             double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
@@ -102,9 +94,9 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
                 //printf("j=%d\n", j);
-                var[j][i] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(10, function1, a, b, c, d, e, f, g, l);
+                var[j][i] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * I(10, k, a, b, c, d, e, f, g, l);
             }
-            var[i][M] = I(100, function2, a, b, c, d);
+            var[i][M] = I(100, func, a, b, c, d);
         }
     }
 }

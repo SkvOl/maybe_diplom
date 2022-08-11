@@ -22,7 +22,7 @@ inline double k(double y1, ...) {
     //return y1 - y2;
 }
 
-inline double f(double x1, ...) {
+inline double func(double x1, ...) {
     va_list args;
     va_start(args, x1);
     double x2 = va_arg(args, double);
@@ -41,6 +41,13 @@ inline double base_func(int i, int j) {
 inline void grad(double(*function)(double, ...), double*& res, double x1, double x2) {
     res[0] = ((*function)(x1 * (1 + mach_eps), x2) - (*function)(x1 * (1 - mach_eps), x2)) / 2.0 / x1 / mach_eps;
     res[1] = ((*function)(x1, x2 * (1 + mach_eps)) - (*function)(x1, x2 * (1 - mach_eps))) / 2.0 / x2 / mach_eps;
+}
+
+inline double div(double(*function)(double, ...), double x1, double x2) {
+    double* res = createv<double>(2);
+
+    grad((*function), res, x1, x2);
+    return res[0] + res[1];
 }
 
 
@@ -112,7 +119,7 @@ inline double I(int N_i, double a, double b) {
     double Sum = 0.0;
     for (size_t i = 0; i < N_i; i++) {
         double l = (i + 0.5) * h_int + a;
-        Sum += f(l);
+        Sum += func(l);
     }
     return Sum * h_int;
 }
