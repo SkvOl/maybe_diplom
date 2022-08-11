@@ -5,7 +5,7 @@
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
 
-const int _n = 10, _N = _n * _n;
+const int _n = 5, _N = _n * _n;
 
 double R = 5;
 double lambda = 1;
@@ -42,7 +42,7 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
                 
                 var[i][j] = base_func(i, j) * (type - 1.0) - lambda * I_k(100, a, b, ksi);
             }
-            var[i][M] = f(ksi);
+            var[i][M] = func(ksi);
         }
     else
         for (size_t i = 0; i < M; i++){
@@ -55,7 +55,7 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
 
                 var[i][j] = base_func(i, j) * (type - 1.0) - lambda * I_k(100, a, b, c, d, ksi1, ksi2);     
             }
-            var[i][M] = f(ksi1, ksi2);
+            var[i][M] = func(ksi1, ksi2);
         }
 }
 
@@ -70,26 +70,18 @@ void mg(double**& var, size_t type, size_t dim_s = 1, int _step = 0) {
     int m = (int)sqrt(N - 1);
 
     if (dim_s == 1) {
-        double(*function)(double, ...) = NULL;
-        function = &k;
-
         for (size_t i = 0; i < M; i++) {
             double a = A + (i + _step) * h, b = A + ((i + _step) + 1.0) * h;
 
             for (size_t j = 0; j < N - 1; j++) {
                 double c = A + j * h, d = A + (j + 1.0) * h;
 
-                var[i][j] = h * base_func(i + _step, j) * (type - 1.0) - lambda * I(100, function, a, b, c, d);
+                var[i][j] = h * base_func(i + _step, j) * (type - 1.0) - lambda * I(100, k, a, b, c, d);
             }
             var[i][N - 1] = I(100, a, b);
         }
     }
     else {
-        double(*function1)(double, ...) = NULL;
-        double(*function2)(double, ...) = NULL;
-        function1 = &k;
-        function2 = &f;
-
         for (size_t j = 0; j < M; j++) {
             short j1 = (j + _step) / m, j2 = (j + _step) % m;
             double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
@@ -100,9 +92,9 @@ void mg(double**& var, size_t type, size_t dim_s = 1, int _step = 0) {
                 double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
                 double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
 
-                var[j][i] = h1 * h2 * base_func(i, j + _step) * (type - 1.0) - lambda * I(10, function1, a, b, c, d, e, f, g, l);
+                var[j][i] = h1 * h2 * base_func(i, j + _step) * (type - 1.0) - lambda * I(10, k, a, b, c, d, e, f, g, l);
             }
-            var[j][N - 1] = I(100, function2, e, f, g, l);
+            var[j][N - 1] = I(100, func, e, f, g, l);
         }
     }
 }
@@ -141,15 +133,15 @@ int main() {
     double t1 = MPI_Wtime();
     mg(a, 2, 2, _step);
     double t2 = MPI_Wtime() - t1;
-    /*printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
-    fflush(stdout);*/
+    printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
+    fflush(stdout);
     //print(a);
 
     t1 = MPI_Wtime();
     gm(a, count_one_rank, _step, _rank, _size);
     t2 = MPI_Wtime() - t1;
-    /*printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
-    fflush(stdout);*/
+    printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
+    fflush(stdout);
     
     
     double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
@@ -185,3 +177,4 @@ int main() {
 
     MPI_Finalize();
 }
+
