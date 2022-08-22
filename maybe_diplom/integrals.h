@@ -42,6 +42,7 @@ inline void grad(double(*function)(double, ...), double*& res, double x1, double
     res[0] = ((*function)(x1 * (1 + mach_eps), x2) - (*function)(x1 * (1 - mach_eps), x2)) / 2.0 / x1 / mach_eps;
     res[1] = ((*function)(x1, x2 * (1 + mach_eps)) - (*function)(x1, x2 * (1 - mach_eps))) / 2.0 / x2 / mach_eps;
 }
+
 inline double div(double(*function)(double, ...), double x1, double x2) {
     double* res = createv<double>(2);
 
