@@ -74,44 +74,6 @@ inline double I_k(int N_i, double a, double b, double c, double d, double ksi1, 
     return h_i * h_j * Sum;
 }
 
-inline double I(int N_i, double(*function)(double, ...), double a, double b, double c, double d) {
-    //двумерный интеграл
-    double h_i = (b - a) / N_i, h_j = (d - c) / N_i;
-    double Sum = 0;
-    for (size_t i = 0; i < N_i; i++) {
-        for (size_t j = 0; j < N_i; j++) {
-            double l1 = a + (i + 0.5) * h_i, l2 = c + (j + 0.5) * h_j;
-            Sum += (*function)(l1, l2);
-        }
-    }
-    return h_i * h_j * Sum;
-}
-
-inline double I(int N_i, double(*function)(double, ...), double a, double b, double c, double d, double e, double f, double g, double h) {
-    //четырёхмерный интеграл
-    double h_i = (b - a) / N_i, 
-           h_j = (d - c) / N_i,
-           h_k = (f - e) / N_i,
-           h_z = (h - g) / N_i;
-
-    double Sum = 0;
-    for (size_t i = 0; i < N_i; i++) {
-        for (size_t j = 0; j < N_i; j++) {
-            for (size_t k = 0; k < N_i; k++) {
-                for (size_t z = 0; z < N_i; z++) {
-                    
-                    double l1 = a + (i + 0.5) * h_i,
-                           l2 = c + (j + 0.5) * h_j,
-                           l3 = e + (i + 0.5) * h_k,
-                           l4 = g + (j + 0.5) * h_z;
-                    Sum += (*function)(l1, l2, l3, l4);
-                }
-            }
-        }
-    }
-    return h_i * h_j * h_k * h_z * Sum;
-}
-
 inline double I(int N_i, double a, double b) {
     //одномерный интеграл
     double h_int = (b - a) / (N_i * 1.0);
@@ -121,6 +83,100 @@ inline double I(int N_i, double a, double b) {
         Sum += func(l);
     }
     return Sum * h_int;
+}
+
+inline double I(int N_i, double(*function)(double, ...), double a, double b, double c, double d) {
+    //двумерный интеграл
+    double h_i = (b - a) / N_i,
+           h_j = (d - c) / N_i;
+    double Sum = 0;
+    for (size_t i = 0; i < N_i; i++) {
+        for (size_t j = 0; j < N_i; j++) {
+            double l1 = a + (i + 0.5) * h_i,
+                   l2 = c + (j + 0.5) * h_j;
+            Sum += (*function)(l1, l2);
+        }
+    }
+    return h_i * h_j * Sum;
+}
+
+inline double I(int N_i, double(*function)(double, ...), double a, double b, double c, double d, double e, double f) {
+    //трёхмерный интеграл
+    double h_i = (b - a) / N_i,
+           h_j = (d - c) / N_i,
+           h_k = (f - e) / N_i;
+
+    double Sum = 0;
+    for (size_t i = 0; i < N_i; i++) {
+        for (size_t j = 0; j < N_i; j++) {
+            for (size_t k = 0; k < N_i; k++) {
+                double l1 = a + (i + 0.5) * h_i,
+                       l2 = c + (j + 0.5) * h_j,
+                       l3 = e + (k + 0.5) * h_k;
+
+                Sum += (*function)(l1, l2, l3);
+            }
+        }
+    }
+    return h_i * h_j * h_k * Sum;
+}
+
+inline double I(int N_i, double(*function)(double, ...), double a, double b, double c, double d, double e, double f, double g, double h) {
+    //четырёхмерный интеграл
+    double h_i = (b - a) / N_i,
+           h_j = (d - c) / N_i,
+           h_k = (f - e) / N_i,
+           h_z = (h - g) / N_i;
+
+    double Sum = 0;
+    for (size_t i = 0; i < N_i; i++) {
+        for (size_t j = 0; j < N_i; j++) {
+            for (size_t k = 0; k < N_i; k++) {
+                for (size_t z = 0; z < N_i; z++) {
+
+                    double l1 = a + (i + 0.5) * h_i,
+                           l2 = c + (j + 0.5) * h_j,
+                           l3 = e + (k + 0.5) * h_k,
+                           l4 = g + (z + 0.5) * h_z;
+                    Sum += (*function)(l1, l2, l3, l4);
+                }
+            }
+        }
+    }
+    return h_i * h_j * h_k * h_z * Sum;
+}
+
+inline double I(int N_i, double(*function)(double, ...), double a, double b, double c, double d, double e, double f, double g, double h, double l, double o, double p, double q) {
+    //шестимерый интеграл
+    double h_i = (b - a) / N_i,
+           h_j = (d - c) / N_i,
+           h_k = (f - e) / N_i,
+           h_z = (h - g) / N_i,
+           h_v = (o - l) / N_i,
+           h_w = (q - p) / N_i;
+
+    double Sum = 0;
+    for (size_t i = 0; i < N_i; i++) {
+        for (size_t j = 0; j < N_i; j++) {
+            for (size_t k = 0; k < N_i; k++) {
+                for (size_t z = 0; z < N_i; z++) {
+                    for (size_t v = 0; v < N_i; v++) {
+                        for (size_t w = 0; w < N_i; w++) {
+
+                            double l1 = a + (i + 0.5) * h_i,
+                                   l2 = c + (j + 0.5) * h_j,
+                                   l3 = e + (k + 0.5) * h_k,
+                                   l4 = g + (z + 0.5) * h_z,
+                                   l5 = l + (v + 0.5) * h_v,
+                                   l6 = p + (w + 0.5) * h_w;
+                            Sum += (*function)(l1, l2, l3, l4, l5, l6);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return h_i * h_j * h_k * h_z * h_v * h_w * Sum;
 }
 
 #endif INTEGRALS_H
