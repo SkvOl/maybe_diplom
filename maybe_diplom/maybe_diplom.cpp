@@ -6,7 +6,7 @@
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
 
-const int n = 50, N = n * n;
+const int n = 5, N = n * n;
 
 double R = 5;
 double lambda = 1;
@@ -102,7 +102,7 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
 }
 
 
-int main1()
+int main2()
 {
     double** a = createm<double>(n, n + 1.0);
 
