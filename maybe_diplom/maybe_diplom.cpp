@@ -102,8 +102,9 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
 }
 
 
-int main2()
+int main1()
 {
+    return 0;
     double** a = createm<double>(n, n + 1.0);
 
     //mk(a, 2, 2);
@@ -132,13 +133,10 @@ int main2()
 
 
 int main() {
+    //return 0;
     double **a = createm<double>(N, N + 1.0), **a1 = createm<double>(N, N + 1.0);
-    time_t start1, end1, start2, end2;
 
-
-    time(&start1);
     mg(a, 2.0, 2);
-    time(&end1);
     
     mk(a1, 2.0, 2);
 
@@ -150,9 +148,9 @@ int main() {
     //print(a1);
     //space(1);
 
-    time(&start2);
+
     gm(a);
-    time(&end2);
+
 
     gm(a1);
 
@@ -179,6 +177,4 @@ int main() {
         printf("%f ", a1[i][N]);
     }
 
-    double time1 = difftime(end1, start1), time2 = difftime(end2, start2);
-    printf("\nTime is: %f\n", time1 + time2);
 }
