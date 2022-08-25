@@ -1,7 +1,7 @@
 ﻿#include "matrix.h"
 #include "integrals.h"
 #include <stdio.h> 
-#include <time.h> 
+
 
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
