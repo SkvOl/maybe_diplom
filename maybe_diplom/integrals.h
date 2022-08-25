@@ -104,8 +104,8 @@ inline double I(int N_i, double(*function)(double, ...), double a, double b, dou
 inline double I(int N_i, double(*function)(double, ...), double a, double b, double c, double d, double e, double f) {
     //трёхмерный интеграл
     double h_i = (b - a) / N_i,
-        h_j = (d - c) / N_i,
-        h_k = (f - e) / N_i;
+           h_j = (d - c) / N_i,
+           h_k = (f - e) / N_i;
 
     double Sum = 0;
     for (size_t i = 0; i < N_i; i++) {
