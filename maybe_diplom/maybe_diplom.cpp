@@ -6,13 +6,13 @@
 const double pi = 3.1415926, Eps = 0.0001;
 const double  k0 = 1, k1 = 1.5 * k0;
 
-const int n = 5, N = n * n;
+const int n = 100, N = n * n;
 
 double R = 5;
-double lambda = 1;
+double lambda = -1.0;
 
 //отрезок для двумерных интегральных уравнений
-double A = 0, B = 1;
+double A = 1, B = 2;
 double C = 0, D = 1;
 
 //шаг для одномерных интегральных уравнений
@@ -23,7 +23,8 @@ double h1 = (B - A) / n, h2 = (D - C) / n;
 
 
 inline double u(double y1) {     
-    return y1 * y1;
+    //return y1 * y1;
+    return y1 - pow(y1, 3) / 6.0;
 }
 
 
@@ -102,12 +103,12 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
 }
 
 
-int main1()
+int main()
 {
-    return 0;
+    //return 0;
     double** a = createm<double>(n, n + 1.0);
 
-    //mk(a, 2, 2);
+
     mg(a, 2);
 
     cout << gm(a) << "\n";
@@ -116,24 +117,17 @@ int main1()
 
     space(1);
 
-    /*for (size_t i = 0; i < N; i++)
-    {
-        short i1 = i / n, i2 = i % n;
-        double ksi1 = A + (i1 + 0.5) * h1, ksi2 = A + (i2 + 0.5) * h2;
-        
-        printf("%f %f %f\n", ksi1, ksi2, a[i][N]);
-    }*/
 
     for (size_t i = 0; i < n; i++)
     {
-        printf("%f\n", a[i][n]);
+        printf("%f %f %f\n", a[i][n], u(A + (i + 1) * h), A + (i + 1) * h);
     }
     return 0;
 }
 
 
-int main() {
-    //return 0;
+int main2() {
+    return 0;
     double **a = createm<double>(N, N + 1.0), **a1 = createm<double>(N, N + 1.0);
 
     mg(a, 2.0, 2);

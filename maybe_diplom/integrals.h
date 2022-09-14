@@ -17,9 +17,10 @@ inline double k(double y1, ...) {
     va_end(args);
 
 
-    return x1 + x2 - y1 * y2;
+    //return x1 + x2 - y1 * y2;
     //return y1 + y2 - x1 * x2;
     //return y1 - y2;
+    return y1 > y2 ? sinh(y1 - y2) : 0;
 }
 
 inline double func(double x1, ...) {
@@ -30,8 +31,9 @@ inline double func(double x1, ...) {
 
     //return sin(10.0 * x1 + 10.0 * x2) + (1.0 / 10000.0) * (-200.0 * x1 - 200.0 * x2 - 2.0) * sin(10.0) + (1.0 / 10000.0) * (100.0 * x1 + 100.0 * x2 - 99.0) * sin(20.0) + (1.0 / 500.0) * cos(10.0) - (1.0 / 500.0) * cos(20.0);
     //return (1.0 / 6.0) * (-6.0 * x1 - 6.0 * x2 + 3.0) * cos(1.0) + (1.0 / 2.0) * x1 + (3.0 / 2.0) * x2 - (1.0 / 2.0) * sin(1.0) - sin(x1) + 1.0 / 6.0;
-    return 1.0 / 3.0;
+    //return 1.0 / 3.0;
     //return pow(x1, 2) - 1.0 * x1 / 3.0 + 1.0 / 4.0;
+    return x1;
 }
 
 inline double base_func(int i, int j) {
