@@ -1,6 +1,6 @@
 ﻿#include "matrix.h"
 #include "integrals.h"
-
+#include "diff_geom.h"
 
 
 int _n = 2, _N = _n * _n;

@@ -48,6 +48,21 @@ inline type_vector* createv(size_t N, bool mod = false) {
 	return var;
 }
 
+template<typename type_matrix_del>
+void del(type_matrix_del**& var) {
+	//очистка памяти указателя var
+	size_t M = _msize(var) / sizeof(var[0]);
+
+	for (size_t i = 0; i < M; i++) free(var[i]);
+	free(var);
+}
+
+template<typename type_vector_del>
+void del(double*& var) {
+	//очистка памяти указателя var
+	free(var);
+}
+
 template<typename type_matrix_print>
 inline void print(type_matrix_print** var, string c = "", int cM = -1, int cN = -1) {
 	//вывод указателя var в консоль
@@ -355,21 +370,6 @@ complex<double>* simple_iteration_c(complex<double>** var = 0, complex<double>* 
 			return res;
 		}
 	}
-}
-
-template<typename type_matrix_del>
-void del(type_matrix_del**& var) {
-	//очистка памяти указателя var
-	size_t M = _msize(var) / sizeof(var[0]);
-
-	for (size_t i = 0; i < M; i++) free(var[i]);
-	free(var);
-}
-
-template<typename type_vector_del>
-void del(double*& var) {
-	//очистка памяти указателя var
-	free(var);
 }
 
 template<typename type_LU>

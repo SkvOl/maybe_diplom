@@ -26,5 +26,8 @@
     <ClInclude Include="integrals.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="diff_geom.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
