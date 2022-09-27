@@ -1,14 +1,9 @@
 #pragma once
 #ifndef INTEGRALS_H
 #define INTEGRALS_H
-#include <math.h>
 #include <stdarg.h>
+#include "constants.h"
 
-const double mach_eps = sqrt(2.22045e-16);
-const double pi = acos(-1);
-const double k0 = 1, k1 = 1.5 * k0;
-const double R = 1;
-const double lambda = 1.0;
 
 //Для комплексных нужно переопределять 
 inline complex<double> k_c(double y1, ...) {
@@ -128,42 +123,38 @@ inline double base_func(int i, int j) {
 
 inline void base_func(double*& var,...) {
     //size_t M = _msize(var) / sizeof(var[0]);
-    double i1, i2, i3, j1, j2, j3;   
+    double it1, it2, it3, jt1, jt2, jt3;   
     
     va_list args;
     va_start(args, var);
-    i1 = va_arg(args, int);
-    i2 = va_arg(args, int);
-    i3 = va_arg(args, int);
+    it1 = va_arg(args, double);
+    it2 = va_arg(args, double);
+    it3 = va_arg(args, double);
 
-    j1 = va_arg(args, int);
-    j2 = va_arg(args, int);
-    j3 = va_arg(args, int);
+    jt1 = va_arg(args, double);
+    jt2 = va_arg(args, double);
+    jt3 = va_arg(args, double);
     va_end(args);
 
     if (var[0] == 1) {
         var[1] = 0.0;
         var[2] = 0.0;
-        if (i1 == j1 && i2 == j2) {
-            double coord1 = A + i1 * h1, coord2 = A + j1 * h1;
-            var[0] = 1.0 + (coord1 - coord2) / h1;
+        if ((jt1 >= it1 - h1 && jt1 <= it1) && (it2 == jt2)) {
+            var[0] = 1.0 + (jt1 - it1) / h1;
         }
-        else if (i1 == j1 - 1 && i2 == j2) {
-            double coord1 = A + i1 * h1, coord2 = A + j1 * h1;
-            var[0] = 1.0 - (coord1 - coord2) / h1;
+        else if ((jt1 <= it1 + h1 && jt1 >= it1) && it2 == jt2) {
+            var[0] = 1.0 - (jt1 - it1) / h1;
         }
         else var[0] = 0.0;
     }
     else if (var[1] == 1) {
         var[0] = 0.0;
         var[2] = 0.0;
-        if (i1 == j1 && i2 == j2) {
-            double coord1 = C + i2 * h2, coord2 = C + j2 * h2;
-            var[1] = 1.0 + (coord1 - coord2) / h2;
+        if ((it1 == jt1) && (jt2 >= it2 - h2 && jt2 <= it2)) {
+            var[1] = 1.0 + (jt2 - it2) / h2;
         }
-        else if (i1 == j1 && i2 == j2 - 1) {
-            double coord1 = C + i2 * h2, coord2 = C + j2 * h2;
-            var[1] = 1.0 - (coord1 - coord2) / h2;
+        else if ((it1 == jt1) && (jt2 <= it2 + h2 && jt2 >= it2)) {
+            var[1] = 1.0 - (jt2 - it2) / h2;
         }
         else var[1] = 0.0;
     }

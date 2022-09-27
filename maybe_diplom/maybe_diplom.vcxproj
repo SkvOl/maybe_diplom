@@ -148,6 +148,7 @@
     <ClCompile Include="maybe_diplom.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="constants.h" />
     <ClInclude Include="diff_geom.h" />
     <ClInclude Include="integrals.h" />
     <ClInclude Include="matrix.h" />
