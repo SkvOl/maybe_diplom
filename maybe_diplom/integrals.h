@@ -122,23 +122,64 @@ inline type_func func(type_func x1, ...) {
     return -(x1 + x2 + x3) * (x1 * x2 * x3 - 9.0 / 8.0);
 }
 
-inline double base_func(int i1, int i2, int j1, int j2, short type, double*& var) {
+inline double base_func(int i, int j) {
+    return i == j ? 1.0 : 0.0;
+}
+
+inline void base_func(double*& var,...) {
+    //size_t M = _msize(var) / sizeof(var[0]);
+    double i1, i2, i3, j1, j2, j3;   
     
-    if (type == 1) return i1 * _n + i2 == j1 * _n + j2 ? 1.0 : 0.0;
-    /*else {
-        if (var[0] == 1) {
-            if (i1 * _n + i2 == j1 * _n + j2) {
-                double coord = A + i1 * h1;
-                var[0] = 1.0 +  
-            }
-        }
-        else if (var[1] == 1) {
+    va_list args;
+    va_start(args, var);
+    i1 = va_arg(args, int);
+    i2 = va_arg(args, int);
+    i3 = va_arg(args, int);
 
-        }
-        else if (var[2] == 1) {
+    j1 = va_arg(args, int);
+    j2 = va_arg(args, int);
+    j3 = va_arg(args, int);
+    va_end(args);
 
+    if (var[0] == 1) {
+        var[1] = 0.0;
+        var[2] = 0.0;
+        if (i1 == j1 && i2 == j2) {
+            double coord1 = A + i1 * h1, coord2 = A + j1 * h1;
+            var[0] = 1.0 + (coord1 - coord2) / h1;
         }
-        else return 0;
+        else if (i1 == j1 - 1 && i2 == j2) {
+            double coord1 = A + i1 * h1, coord2 = A + j1 * h1;
+            var[0] = 1.0 - (coord1 - coord2) / h1;
+        }
+        else var[0] = 0.0;
+    }
+    else if (var[1] == 1) {
+        var[0] = 0.0;
+        var[2] = 0.0;
+        if (i1 == j1 && i2 == j2) {
+            double coord1 = C + i2 * h2, coord2 = C + j2 * h2;
+            var[1] = 1.0 + (coord1 - coord2) / h2;
+        }
+        else if (i1 == j1 && i2 == j2 - 1) {
+            double coord1 = C + i2 * h2, coord2 = C + j2 * h2;
+            var[1] = 1.0 - (coord1 - coord2) / h2;
+        }
+        else var[1] = 0.0;
+    }
+    /*else if (var[2] == 1) {
+        var[0] = 0.0;
+        var[1] = 0.0;
+
+        if (i1 == j1 && i2 == j2) {
+            double coord1 = C + i2 * h2, coord2 = C + j2 * h2;
+            var[2] = 1.0 + (coord1 - coord2) / h2;
+        }
+        else if (i1 == j1 && i2 == j2 - 1) {
+            double coord1 = C + i2 * h2, coord2 = C + j2 * h2;
+            var[2] = 1.0 - (coord1 - coord2) / h2;
+        }
+        else var[2] = 0.0;
     }*/
 }
 
