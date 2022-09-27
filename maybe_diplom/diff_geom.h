@@ -4,44 +4,44 @@
 #include "matrix.h"
 #include "integrals.h"
 
-double x(double t1, double t2, double*& var, int k)
+double x_screen(double t1, double t2, double*& var, int k)
 {
 	switch (k) {
 	case 0:return R * cos(t1) * cos(t2);
 	case 1:
 	{
 		double* var1 = NULL;
-		var[0] = (x(t1 * (1.0 + mach_eps), t2, var1, 0) - x(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / t1 / mach_eps;
-		var[1] = (x(t1, t2 * (1.0 + mach_eps), var1, 0) - x(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / t2 / mach_eps;
+		var[0] = (x_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - x_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / t1 / mach_eps;
+		var[1] = (x_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - x_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / t2 / mach_eps;
 		return 0;
 	}
 	}
 }
 
-double y(double t1, double t2, double*& var, int k)
+double y_screen(double t1, double t2, double*& var, int k)
 {
 	switch (k) {
 	case 0:return R * cos(t1) * sin(t2);
 	case 1:
 	{
 		double* var1 = NULL;
-		var[0] = (y(t1 * (1.0 + mach_eps), t2, var1, 0) - y(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / t1 / mach_eps;
-		var[1] = (y(t1, t2 * (1.0 + mach_eps), var1, 0) - y(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / t2 / mach_eps;
+		var[0] = (y_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - y_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / t1 / mach_eps;
+		var[1] = (y_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - y_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / t2 / mach_eps;
 
 		return 0;
 	}
 	}
 }
 
-double z(double t1, double t2, double*& var, int k)
+double z_screen(double t1, double t2, double*& var, int k)
 {
 	switch (k) {
 	case 0:return R * sin(t1);
 	case 1:
 	{
 		double* var1 = NULL;
-		var[0] = (z(t1 * (1.0 + mach_eps), t2, var1, 0) - z(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / t1 / mach_eps;
-		var[1] = (z(t1, t2 * (1.0 + mach_eps), var1, 0) - z(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / t2 / mach_eps;
+		var[0] = (z_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - z_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / t1 / mach_eps;
+		var[1] = (z_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - z_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / t2 / mach_eps;
 		return 0;
 	}
 	}
@@ -69,6 +69,16 @@ double det_g(double(*function_x)(double, double, double*&, int), double(*functio
 	return var[0][0] * var[1][1] - var[0][1] * var[1][0];
 }
 
+double det_g_reverse(double** var1, double**& var2) {
+	double coef = 1.0 / (var1[0][0] * var1[1][1] - var1[0][1] * var1[1][0]);
+	var2[0][0] = var1[1][1] / coef;
+	var2[0][1] = -var1[0][1] / coef;
+	var2[1][0] = -var1[1][0] / coef;
+	var2[1][1] = var1[0][0] / coef;
+
+	return var2[0][0] * var2[1][1] - var2[0][1] * var2[1][0];
+}
+
 double I(int N_i, double(*function_x)(double, double, double*&, int), double(*function_y)(double, double, double*&, int), double(*function_z)(double, double, double*&, int), double** var, double t1_a, double t1_b, double t2_c, double t2_d)
 {
 	double h_i = (t1_b - t1_a) / N_i,
@@ -76,7 +86,7 @@ double I(int N_i, double(*function_x)(double, double, double*&, int), double(*fu
 	double Sum = 0;
 	for (size_t i = 0; i < N_i; i++) {
 		for (size_t j = 0; j < N_i; j++) {
-			Sum += sqrt(det_g(x, y, z, t1_a + (i + 0.5) * h_i, t2_c + (j + 0.5) * h_j, var));
+			Sum += sqrt(det_g((*function_x), (*function_y), (*function_z), t1_a + (i + 0.5) * h_i, t2_c + (j + 0.5) * h_j, var));
 		}
 	}
 	return h_i * h_j * Sum;

@@ -122,8 +122,36 @@ inline type_func func(type_func x1, ...) {
     return -(x1 + x2 + x3) * (x1 * x2 * x3 - 9.0 / 8.0);
 }
 
-inline double base_func(int i, int j) {
-    return i == j ? 1.0 : 0.0;
+inline double base_func(int i1, int i2, int j1, int j2, short type, double*& var) {
+    
+    if (type == 1) return i1 * _n + i2 == j1 * _n + j2 ? 1.0 : 0.0;
+    /*else {
+        if (var[0] == 1) {
+            if (i1 * _n + i2 == j1 * _n + j2) {
+                double coord = A + i1 * h1;
+                var[0] = 1.0 +  
+            }
+        }
+        else if (var[1] == 1) {
+
+        }
+        else if (var[2] == 1) {
+
+        }
+        else return 0;
+    }*/
+}
+
+inline double base_f(double t1, double t2, int down_index1, int down_index2, int up_index1, int up_index2) {
+    double d1, d2, d3, d4;
+    if (up_index2 == 1) {
+        d1 = h1 * down_index1, d2 = h1 * (down_index1 + 2.0), d3 = h2 * down_index2, d4 = h2 * (down_index2 + 1.0);
+        return d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t1 - h1 * (down_index1 + 1.0)) / h1 / 1.0 : 0.0;
+    }
+    else {
+        d1 = h1 * down_index1, d2 = h1 * (down_index1 + 1.0), d3 = h2 * down_index2, d4 = h2 * (down_index2 + 2.0);
+        return d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t2 - h2 * (down_index2 + 1.0)) / h2 / 1.0 : 0.0;
+    }
 }
 
 inline void grad(double(*function)(double, ...), double*& res, double x1, double x2) {
