@@ -29,7 +29,7 @@ inline type_matrix** createm(size_t M, size_t N, bool mod = false) {
 	if (mod)
 		for (size_t i = 0; i < M; i++)
 			for (size_t j = 0; j < N; j++)
-				if (i == j) var[i][j] = 1;
+				if (i == j) var[i][j] = 0;
 				else var[i][j] = 0;
 
 	return var;
@@ -49,7 +49,7 @@ inline type_vector* createv(size_t N, bool mod = false) {
 }
 
 template<typename type_matrix_del>
-void del(type_matrix_del**& var) {
+void del(type_matrix_del** var) {
 	//очистка памяти указателя var
 	size_t M = _msize(var) / sizeof(var[0]);
 
@@ -58,7 +58,7 @@ void del(type_matrix_del**& var) {
 }
 
 template<typename type_vector_del>
-void del(double*& var) {
+void del(type_vector_del* var) {
 	//очистка памяти указателя var
 	free(var);
 }
@@ -161,7 +161,7 @@ int size(type_vector_size* var) {
 }
 
 template<class type_gm>
-string gm(type_gm**& var, int* count_one_rank = NULL, int _step = 0, int _rank = 0, int _size = 0) {
+string gm(type_gm** var, int* count_one_rank = NULL, int _step = 0, int _rank = 0, int _size = 0) {
 	//метод Гаусса
 	MPI_Status status;
 	MPI_Request request;
@@ -373,7 +373,7 @@ complex<double>* simple_iteration_c(complex<double>** var = 0, complex<double>* 
 }
 
 template<typename type_LU>
-void LU(type_LU** var, type_LU**& L, type_LU**& U) {
+void LU(type_LU** var, type_LU** L, type_LU** U) {
 	size_t M = _msize(var) / sizeof(var[0]);
 
 	for (size_t i = 0; i < M; i++) {
@@ -404,16 +404,17 @@ void LU(type_LU** var, type_LU**& L, type_LU**& U) {
 }
 
 template<typename type_mult>
-inline void mult(type_mult** var1, type_mult** var2, type_mult**& res) {
-	size_t M = _msize(var1) / sizeof(var1[0]);
-	size_t N = _msize(var1[0]) / sizeof(var1[0][0]);
+inline void mult(type_mult** var1, type_mult** var2, type_mult** res) {
+	size_t M1 = _msize(var1) / sizeof(var1[0]);
+	size_t N1 = _msize(var1[0]) / sizeof(var1[0][0]);
+	size_t N2 = _msize(var2[0]) / sizeof(var2[0][0]);
 
-	for (size_t i = 0; i < M; i++)
+	for (size_t i = 0; i < M1; i++)
 	{
-		for (size_t j = 0; j < M; j++)
+		for (size_t j = 0; j < N2; j++)
 		{
 			type_mult sum = 0;
-			for (size_t k = 0; k < M; k++)
+			for (size_t k = 0; k < N1; k++)
 			{
 				sum += var1[i][k] * var2[k][j];
 			}

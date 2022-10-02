@@ -185,7 +185,7 @@ int main2() {
     MPI_Finalize();
 }
 
-int main() {
+int main2g() {
     return 0;
     _N *= _n;
     int _rank, _size;
@@ -344,4 +344,56 @@ int main3si() {
 
 
     MPI_Finalize();
+}
+
+
+
+int Проверка_базисной_функции() {
+    return 0;
+    double _A = -pi / 2.0, _B = pi / 2.0;
+    double _C = 0.0, _D = 2.0 * pi;
+    double num_t = 1005.0;
+    h1 = (_B - _A) / 4.0;
+    h2 = (_D - _C) / 4.0;
+
+    cout << h1 << " " << h2 << "\n";
+    
+    ofstream file1("v1.txt", ios_base::out);
+    file1 << "t1 " << "t2 " << "t3 " << "v\n";
+
+    ofstream file2("v2.txt", ios_base::out);
+    file2 << "t1 " << "t2 " << "t3 " << "v\n";
+
+    ofstream file3("v3.txt", ios_base::out);
+    file3 << "t1 " << "t2 " << "t3 " << "v\n";
+    for (double t1 = _A; t1 < _B; t1 += (_B - _A) / num_t) {
+        for (double t2 = _C; t2 < _D; t2 += (_D - _C) / num_t) {
+            double** res = createm<double>(3, 1);
+            base_func(x1_screen, x2_screen, x3_screen, t1, t2, 1, 1, 0, 2, res);
+            file1 << t1 << " " << t2 << " " << 0 << " " << res[0][0] << "\n";
+            file2 << t1 << " " << t2 << " " << 0 << " " << res[1][0] << "\n";
+            file3 << t1 << " " << t2 << " " << 0 << " " << res[2][0] << "\n";
+            del(res);
+        }
+    }
+    file1.close();
+    file2.close();
+    file3.close();
+}
+
+int main/*Проверка_интеграла*/() {
+    //return 0;
+    //double** tensor = createm<double>(2, 2);
+    //cout << "I2: " << I(100, x1_screen, x2_screen, x3_screen, tensor, -pi / 2.0, pi / 2.0, 0.0, 2.0 * pi) << "\n\n";
+
+    double _A = -pi / 2.0, _B = pi / 2.0;
+    double _C = 0.0, _D = 2.0 * pi;
+    h1 = (_B - _A) / 4.0;
+    h2 = (_D - _C) / 4.0;
+    double** tensor = createm<double>(2, 2);
+    complex<double>** A_v_res = createm<complex<double>>(3, 1);
+
+    A_v(3, 0, k_c, x1_screen, x2_screen, x3_screen, tensor, A_v_res, _A, _B, _C, _D, -pi / 3.0, pi / 3.0, 0, 1, 1);
+    print(tensor);
+    print(A_v_res);
 }

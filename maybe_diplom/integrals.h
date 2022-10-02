@@ -3,22 +3,26 @@
 #define INTEGRALS_H
 #include <stdarg.h>
 #include "constants.h"
+#include "diff_geom.h"
+
 
 
 //Для комплексных нужно переопределять 
-inline complex<double> k_c(double y1, ...) {
-    double y2, x1, x2;
+inline complex<double> k_c(double x1, ...) {
+    double x2, x3, y1, y2, y3;
     va_list args;
 
-    va_start(args, y1);
-    y2 = va_arg(args, double);
-    x1 = va_arg(args, double);
+    va_start(args, x1);
     x2 = va_arg(args, double);
+    x3 = va_arg(args, double);
 
+    y1 = va_arg(args, double);
+    y2 = va_arg(args, double);
+    y3 = va_arg(args, double);
     va_end(args);
 
 
-    complex<double> i(0, 1), K(k0, 0), r(sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2)), 0), pi4(4 * pi, 0);
+    complex<double> i(0, 1), K = k0, r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2)), pi4 = 4.0 * pi;
     return exp(i * K * r) / pi4 / r;
 }
 inline complex<double> func_c(double x1, ...) {
@@ -39,7 +43,7 @@ inline complex<double> In_c(int N_i, complex<double>(*function)(double, ...), do
         h_k = (f - e) / N_i,
         h_z = (h - g) / N_i;
 
-    complex<double> Sum(0, 0);
+    complex<double> Sum=0;
     for (size_t i = 0; i < N_i; i++) {
         for (size_t j = 0; j < N_i; j++) {
             for (size_t k = 0; k < N_i; k++) {
@@ -121,7 +125,7 @@ inline double base_func(int i, int j) {
     return i == j ? 1.0 : 0.0;
 }
 
-inline void base_func(double*& var,...) {
+inline void base_func(double* var,...) {
     //size_t M = _msize(var) / sizeof(var[0]);
     double it1, it2, it3, jt1, jt2, jt3;   
     
@@ -174,19 +178,28 @@ inline void base_func(double*& var,...) {
     }*/
 }
 
-inline double base_f(double t1, double t2, int down_index1, int down_index2, int up_index1, int up_index2) {
+inline void base_func(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int),double t1, double t2, int down_index1, int down_index2, int up_index1, int up_index2, double **var) {
+    double** J = createm<double>(3, 2), ** v_vec = createm<double>(2, 1);
+    Jacobian((*function_x1), (*function_x2), (*function_x3), t1, t2, J);
     double d1, d2, d3, d4;
     if (up_index2 == 1) {
         d1 = h1 * down_index1, d2 = h1 * (down_index1 + 2.0), d3 = h2 * down_index2, d4 = h2 * (down_index2 + 1.0);
-        return d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t1 - h1 * (down_index1 + 1.0)) / h1 / 1.0 : 0.0;
+        v_vec[0][0] = d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t1 - h1 * (down_index1 + 1.0)) / h1 / 1.0 : 0.0;
+        v_vec[1][0] = 0.0;
     }
     else {
         d1 = h1 * down_index1, d2 = h1 * (down_index1 + 1.0), d3 = h2 * down_index2, d4 = h2 * (down_index2 + 2.0);
-        return d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t2 - h2 * (down_index2 + 1.0)) / h2 / 1.0 : 0.0;
+        v_vec[0][0] = 0.0;
+        v_vec[1][0] = d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t2 - h2 * (down_index2 + 1.0)) / h2 / 1.0 : 0.0;
     }
+
+    mult(J, v_vec, var);
+
+    del(J); 
+    del(v_vec);
 }
 
-inline void grad(double(*function)(double, ...), double*& res, double x1, double x2) {
+inline void grad(double(*function)(double, ...), double* res, double x1, double x2) {
     res[0] = ((*function)(x1 * (1 + mach_eps), x2) - (*function)(x1 * (1 - mach_eps), x2)) / 2.0 / x1 / mach_eps;
     res[1] = ((*function)(x1, x2 * (1 + mach_eps)) - (*function)(x1, x2 * (1 - mach_eps))) / 2.0 / x2 / mach_eps;
 }
