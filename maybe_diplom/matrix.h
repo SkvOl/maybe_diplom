@@ -423,6 +423,15 @@ inline void mult(type_mult** var1, type_mult** var2, type_mult** res) {
 	}
 }
 
+template<typename type_mult>
+inline type_mult mult(type_mult** var1, type_mult* var2) {
+	size_t M = _msize(var2) / sizeof(var2[0]);
+
+	type_mult Sum = 0;
+	for (size_t i = 0; i < M; i++) Sum += var1[i][0] * var2[i];
+	return Sum;
+}
+
 template<typename type_diag>
 type_diag** diag(type_diag** var) {
 	size_t M = _msize(var) / sizeof(var[0]);

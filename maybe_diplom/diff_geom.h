@@ -100,10 +100,10 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 	var2[2][0] = 0.0;
 
 	double h_i = (t1_b - t1_a) / N_i,
-		h_j = (t2_d - t2_c) / N_i;
+		   h_j = (t2_d - t2_c) / N_i;
 
 	double** v = createm<double>(3, 1);
-	type_A_v Sum = 0;
+
 
 	switch (k) {
 	case 0: 
@@ -172,21 +172,21 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 	del(v);
 }
 
-inline void d_x(short type, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, double** var) {
+inline void d_x(short type, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, double* var) {
 	if (type == 1) {
 		double* ksi_x1 = createv<double>(2), * ksi_x2 = createv<double>(2), * ksi_x3 = createv<double>(2);
 		(*function_x1)(t1, t2, ksi_x1, 1); (*function_x2)(t1, t2, ksi_x2, 1); (*function_x3)(t1, t2, ksi_x3, 1);
-		var[0][0] = ksi_x1[0];
-		var[1][0] = ksi_x2[0];
-		var[2][0] = ksi_x3[0];
+		var[0] = ksi_x1[0];
+		var[1] = ksi_x2[0];
+		var[2] = ksi_x3[0];
 		del(ksi_x1); del(ksi_x2); del(ksi_x3);
 	}
 	else if (type == 2) {
 		double* ksi_x1 = createv<double>(2), * ksi_x2 = createv<double>(2), * ksi_x3 = createv<double>(2);
 		(*function_x1)(t1, t2, ksi_x1, 1); (*function_x2)(t1, t2, ksi_x2, 1); (*function_x3)(t1, t2, ksi_x3, 1);
-		var[0][0] = ksi_x1[1];
-		var[1][0] = ksi_x2[1];
-		var[2][0] = ksi_x3[1];
+		var[0] = ksi_x1[1];
+		var[1] = ksi_x2[1];
+		var[2] = ksi_x3[1];
 		del(ksi_x1); del(ksi_x2); del(ksi_x3);
 	}
 }
@@ -206,45 +206,147 @@ inline double I(int N_i, double(*function_x1)(double, double, double*, int), dou
 	return h_i * h_j * Sum;
 }
 
-inline complex<double> S(int N_i, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double a, double b, double c, double d, double e, double f, double g, double h, int down_index1, int down_index2, int up_index2) {
-	double h_i = (b - a) / N_i,
-		h_j = (d - c) / N_i;
-	complex<double> Sum = 0;
+//inline complex<double> S(int N_i, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double a, double b, double c, double d, double e, double f, double g, double h, int down_index1, int down_index2, int up_index2) {
+//	double h_i = (b - a) / N_i,
+//		h_j = (d - c) / N_i;
+//	complex<double> Sum = 0;
+//
+//	for (size_t i = 0; i < N_i; i++) {
+//		for (size_t j = 0; j < N_i; j++) {
+//			double l1 = a + (i + 0.5) * h_i,
+//				l2 = c + (j + 0.5) * h_j;
+//
+//			double** tensor = createm<double>(2, 2), ** tensor_reverse = createm<double>(2, 2);
+//
+//			double sq_det = det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor);
+//			det_g_reverse(tensor, tensor_reverse);
+//
+//			for (size_t mu = 0; mu < 2; mu++)
+//			{
+//				for (size_t nu = 0; nu < 2; nu++)
+//				{
+//					double** private_diff_x = createm<double>(3, 1);
+//					complex<double>** Sum3 = createm<complex<double>>(3, 1, true);
+//					d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), l1, l2, private_diff_x);
+//
+//					for (size_t alpha = 0; alpha < 3; alpha++)
+//					{
+//						for (size_t beta = 0; beta < 3; beta++)
+//						{
+//							double** private_diff_x2 = createm<double>(3, 1);
+//							complex<double>** A_v_res1 = createm<complex<double>>(3, 1), ** proizv = createm<complex<double>>(3, 1, true);
+//							A_v(3, alpha + 1, k_c, x1_screen, x2_screen, x3_screen, tensor, A_v_res1, e, f, g, h, l1, l2, down_index1, down_index2, up_index2);
+//							d_x(beta + 1, (*function_x1), (*function_x2), (*function_x3), l1, l2, private_diff_x2);
+//						}
+//					}
+//
+//					del(private_diff_x);
+//				}
+//			}
+//			del(tensor); del(tensor_reverse);
+//		}
+//	}
+//}
 
-	for (size_t i = 0; i < N_i; i++) {
-		for (size_t j = 0; j < N_i; j++) {
-			double l1 = a + (i + 0.5) * h_i,
-				l2 = c + (j + 0.5) * h_j;
 
-			double** tensor = createm<double>(2, 2), ** tensor_reverse = createm<double>(2, 2);
+template<typename type_div>
+inline type_div div(short k, double** tensor, double **tensor_reverse, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, int down_index1, int down_index2, int up_index2) {
+	size_t M = _msize(tensor_reverse) / sizeof(tensor_reverse[0]);
+	size_t N = _msize(tensor_reverse[0]) / sizeof(tensor_reverse[0][0]);
 
-			double sq_det = det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor);
-			det_g_reverse(tensor, tensor_reverse);
+	double e = A + down_index1 * h1, f = e + h1;
+	double g = C + down_index2 * h2, l = g + h2;
 
-			for (size_t mu = 0; mu < 2; mu++)
+	type_div Sum = 0;
+
+	switch (k) {
+	case 0:
+	{
+		for (size_t mu = 0; mu < M; mu++)
+		{
+			for (size_t nu = 0; nu < N; nu++)
 			{
-				for (size_t nu = 0; nu < 2; nu++)
-				{
-					double** private_diff_x = createm<double>(3, 1);
-					complex<double>** Sum3 = createm<complex<double>>(3, 1, true);
-					d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), l1, l2, private_diff_x);
+				type_div** A_v_res = createm<type_div>(3, 1);
+				double* x = createv<double>(3);
 
-					for (size_t alpha = 0; alpha < 3; alpha++)
-					{
-						for (size_t beta = 0; beta < 3; beta++)
-						{
-							double** private_diff_x2 = createm<double>(3, 1);
-							complex<double>** A_v_res1 = createm<complex<double>>(3, 1), ** proizv = createm<complex<double>>(3, 1, true);
-							A_v(3, alpha + 1, k_c, x1_screen, x2_screen, x3_screen, tensor, A_v_res1, e, f, g, h, l1, l2, down_index1, down_index2, up_index2);
-							d_x(beta + 1, (*function_x1), (*function_x2), (*function_x3), l1, l2, private_diff_x2);
-						}
-					}
+				det_g((*function_x1), (*function_x2), (*function_x3), t1, t2, tensor);
+				det_g_reverse(tensor, tensor_reverse);
+				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor_reverse, A_v_res, e, f, g, l, t1, t2, down_index1, down_index2, up_index2);
+				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1, t2, x);
 
-					del(private_diff_x);
-				}
+				Sum += mult(A_v_res, x) * tensor_reverse[mu][nu];
+
+				del(A_v_res); del(x);
 			}
-			del(tensor); del(tensor_reverse);
 		}
 	}
+	case 1:
+	{
+		double** tensor2 = createm<double>(M, N), ** tensor_reverse2 = createm<double>(M, N);
+
+		det_g((*function_x1), (*function_x2), (*function_x3), t1 * (1.0 + mach_eps), t2, tensor);
+		det_g((*function_x1), (*function_x2), (*function_x3), t1 * (1.0 - mach_eps), t2, tensor2);
+		det_g_reverse(tensor, tensor_reverse);
+		det_g_reverse(tensor2, tensor_reverse2);
+		for (size_t mu = 0; mu < M; mu++)
+		{
+			for (size_t nu = 0; nu < N; nu++)
+			{
+				type_div** A_v_res1 = createm<type_div>(3, 1), ** A_v_res2 = createm<type_div>(3, 1);
+				double* x1 = createv<double>(3),* x2 = createv<double>(3);
+
+				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res1, e, f, g, l, t1 * (1.0 + mach_eps), t2, down_index1, down_index2, up_index2);
+				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor2, A_v_res2, e, f, g, l, t1 * (1.0 - mach_eps), t2, down_index1, down_index2, up_index2);
+				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1 * (1.0 + mach_eps), t2, x1);
+				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1 * (1.0 - mach_eps), t2, x2);
+				
+				Sum += (mult(A_v_res1, x1) * tensor_reverse[mu][nu] - mult(A_v_res2, x2) * tensor_reverse2[mu][nu]);
+
+
+				del(A_v_res1); del(x1); 
+				del(A_v_res2); del(x2);
+			}
+		}
+		del(tensor2); del(tensor_reverse2);
+		Sum /= ((t1 + mach_eps) * mach_eps);
+	}
+	case 2:
+	{
+		double** tensor2 = createm<double>(M, N), ** tensor_reverse2 = createm<double>(M, N);
+
+		det_g((*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 + mach_eps), tensor);
+		det_g((*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 - mach_eps), tensor2);
+		det_g_reverse(tensor, tensor_reverse);
+		det_g_reverse(tensor2, tensor_reverse2);
+		for (size_t mu = 0; mu < M; mu++)
+		{
+			for (size_t nu = 0; nu < N; nu++)
+			{
+				type_div** A_v_res1 = createm<type_div>(3, 1), ** A_v_res2 = createm<type_div>(3, 1);
+				double* x1 = createv<double>(3), * x2 = createv<double>(3);
+
+				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res1, e, f, g, l, t1, t2 * (1.0 + mach_eps), down_index1, down_index2, up_index2);
+				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor2, A_v_res2, e, f, g, l, t1, t2 * (1.0 - mach_eps), down_index1, down_index2, up_index2);
+				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 + mach_eps), x1);
+				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 - mach_eps), x2);
+
+				Sum += (mult(A_v_res1, x1) * tensor_reverse[mu][nu] - mult(A_v_res2, x2) * tensor_reverse2[mu][nu]);
+
+
+				del(A_v_res1); del(x1);
+				del(A_v_res2); del(x2);
+			}
+		}
+		del(tensor2); del(tensor_reverse2);
+		Sum /= ((t2 + mach_eps) * mach_eps);
+	}
+	}
+	return Sum;
 }
+
+inline void grad() {
+
+}
+
+
 #endif DIFF_GEOM_H

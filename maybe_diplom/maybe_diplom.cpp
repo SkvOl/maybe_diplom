@@ -185,7 +185,7 @@ int main2() {
     MPI_Finalize();
 }
 
-int main2g() {
+int main3g() {
     return 0;
     _N *= _n;
     int _rank, _size;
@@ -348,7 +348,7 @@ int main3si() {
 
 
 
-int Проверка_базисной_функции() {
+int /*main*/Проверка_базисной_функции() {
     return 0;
     double _A = -pi / 2.0, _B = pi / 2.0;
     double _C = 0.0, _D = 2.0 * pi;
@@ -381,8 +381,8 @@ int Проверка_базисной_функции() {
     file3.close();
 }
 
-int main/*Проверка_интеграла*/() {
-    //return 0;
+int /*main*/Проверка_интеграла() {
+    return 0;
     //double** tensor = createm<double>(2, 2);
     //cout << "I2: " << I(100, x1_screen, x2_screen, x3_screen, tensor, -pi / 2.0, pi / 2.0, 0.0, 2.0 * pi) << "\n\n";
 
@@ -396,4 +396,15 @@ int main/*Проверка_интеграла*/() {
     A_v(3, 0, k_c, x1_screen, x2_screen, x3_screen, tensor, A_v_res, _A, _B, _C, _D, -pi / 3.0, pi / 3.0, 0, 1, 1);
     print(tensor);
     print(A_v_res);
+}
+
+
+void test(double** a) {
+    a[0][0] = 1;
+    a[0][1] = 2;
+    a[1][0] = 3;
+    a[1][1] = 4;
+}
+int main() {
+
 }
