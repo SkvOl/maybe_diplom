@@ -385,26 +385,9 @@ int /*main*/Проверка_интеграла() {
     return 0;
     //double** tensor = createm<double>(2, 2);
     //cout << "I2: " << I(100, x1_screen, x2_screen, x3_screen, tensor, -pi / 2.0, pi / 2.0, 0.0, 2.0 * pi) << "\n\n";
-
-    double _A = -pi / 2.0, _B = pi / 2.0;
-    double _C = 0.0, _D = 2.0 * pi;
-    h1 = (_B - _A) / 4.0;
-    h2 = (_D - _C) / 4.0;
-    double** tensor = createm<double>(2, 2);
-    complex<double>** A_v_res = createm<complex<double>>(3, 1);
-
-    A_v(3, 0, k_c, x1_screen, x2_screen, x3_screen, tensor, A_v_res, _A, _B, _C, _D, -pi / 3.0, pi / 3.0, 0, 1, 1);
-    print(tensor);
-    print(A_v_res);
 }
 
 
-void test(double** a) {
-    a[0][0] = 1;
-    a[0][1] = 2;
-    a[1][0] = 3;
-    a[1][1] = 4;
-}
 int main() {
 
 }
