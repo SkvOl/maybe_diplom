@@ -22,7 +22,8 @@ inline complex<double> k_c(double x1, ...) {
     va_end(args);
 
 
-    complex<double> i(0, 1), K = k0, r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2)), pi4 = 4.0 * pi;
+    complex<double> i(0, 1), K = k0, r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2) + pow(x3 - y3, 2)), pi4 = 4.0 * pi;
+    r.real() < 0.0001 ? r += mach_eps : r = r;
     return exp(i * K * r) / pi4 / r;
 }
 inline complex<double> func_c(double x1, ...) {

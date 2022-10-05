@@ -43,7 +43,7 @@ inline type_vector* createv(size_t N, bool mod = false) {
 
 	if (mod)
 		for (size_t i = 0; i < N; i++)
-			var[i] = 1;
+			var[i] = 0;
 
 	return var;
 }
@@ -403,8 +403,8 @@ void LU(type_LU** var, type_LU** L, type_LU** U) {
 	}
 }
 
-template<typename type_mult>
-inline void mult(type_mult** var1, type_mult** var2, type_mult** res) {
+template<typename type_mult1>
+inline void mult(type_mult1** var1, type_mult1** var2, type_mult1** res) {
 	size_t M1 = _msize(var1) / sizeof(var1[0]);
 	size_t N1 = _msize(var1[0]) / sizeof(var1[0][0]);
 	size_t N2 = _msize(var2[0]) / sizeof(var2[0][0]);
@@ -413,7 +413,7 @@ inline void mult(type_mult** var1, type_mult** var2, type_mult** res) {
 	{
 		for (size_t j = 0; j < N2; j++)
 		{
-			type_mult sum = 0;
+			type_mult1 sum = 0;
 			for (size_t k = 0; k < N1; k++)
 			{
 				sum += var1[i][k] * var2[k][j];
@@ -422,16 +422,34 @@ inline void mult(type_mult** var1, type_mult** var2, type_mult** res) {
 		}
 	}
 }
-
-template<typename type_mult>
-inline type_mult mult(type_mult** var1, type_mult* var2) {
+//
+template<typename type_mult2>
+inline type_mult2 mult(type_mult2** var1, type_mult2* var2) {
 	size_t M = _msize(var2) / sizeof(var2[0]);
 
-	type_mult Sum = 0;
+	type_mult2 Sum = 0;
 	for (size_t i = 0; i < M; i++) Sum += var1[i][0] * var2[i];
 	return Sum;
 }
 
+template<typename type_multv1>
+inline type_multv1 multv1(double** var1, type_multv1* var2) {
+	size_t M = _msize(var2) / sizeof(var2[0]);
+
+	type_multv1 Sum = 0;
+	for (size_t i = 0; i < M; i++) Sum += var1[i][0] * var2[i];
+	return Sum;
+}
+
+template<typename type_multv2>
+inline type_multv2 multv2(type_multv2** var1, double* var2) {
+	size_t M = _msize(var2) / sizeof(var2[0]);
+
+	type_multv2 Sum = 0;
+	for (size_t i = 0; i < M; i++) Sum += var1[i][0] * var2[i];
+	return Sum;
+}
+//
 template<typename type_diag>
 type_diag** diag(type_diag** var) {
 	size_t M = _msize(var) / sizeof(var[0]);

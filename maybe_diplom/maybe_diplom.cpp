@@ -389,5 +389,6 @@ int /*main*/Проверка_интеграла() {
 
 
 int main() {
-
+    double** tensor = createm<double>(2, 2), ** tensor_reverse = createm<double>(2, 2);
+    cout <<"INTEGRAL: " << S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, 1, 2, 1, 1, 1, 1) << "\n";
 }

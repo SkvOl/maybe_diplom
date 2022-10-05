@@ -109,12 +109,11 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 
 
 	switch (k) {
-	case 0: 
-	{
+	case 0: {
 		for (size_t i = 0; i < N_i; i++) {
 			for (size_t j = 0; j < N_i; j++) {
 				double l1 = e + (i + 0.5) * h_i,
-					l2 = g + (j + 0.5) * h_j;
+					   l2 = g + (j + 0.5) * h_j;
 
 				base_func((*function_x1), (*function_x2), (*function_x3), l1, l2, down_index1, down_index2, 0, up_index2, v);
 				type_A_v ker = (*function)((*function_x1)(t1, t2, NULL, 0), (*function_x2)(t1, t2, NULL, 0), (*function_x3)(t1, t2, NULL, 0), (*function_x1)(l1, l2, NULL, 0), (*function_x2)(l1, l2, NULL, 0), (*function_x3)(l1, l2, NULL, 0));
@@ -122,15 +121,15 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 
 				var2[0][0] += ker * v[0][0] * sq_det;
 				var2[1][0] += ker * v[1][0] * sq_det;
-				var2[2][0] += ker * v[1][0] * sq_det;
+				var2[2][0] += ker * v[2][0] * sq_det;
 			}
 		}
 		var2[0][0] *= h_i * h_j;
 		var2[1][0] *= h_i * h_j;
 		var2[2][0] *= h_i * h_j;
+		break;
 	}
-	case 1:
-	{
+	case 1: {
 		for (size_t i = 0; i < N_i; i++) {
 			for (size_t j = 0; j < N_i; j++) {
 				double l1 = e + (i + 0.5) * h_i,
@@ -143,15 +142,15 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 
 				var2[0][0] += (ker1 - ker2) * v[0][0] * sq_det;
 				var2[1][0] += (ker1 - ker2) * v[1][0] * sq_det;
-				var2[2][0] += (ker1 - ker2) * v[1][0] * sq_det;
+				var2[2][0] += (ker1 - ker2) * v[2][0] * sq_det;
 			}
 		}
 		var2[0][0] *= h_i * h_j / 2.0 / (t1 + mach_eps) / mach_eps;
 		var2[1][0] *= h_i * h_j / 2.0 / (t1 + mach_eps) / mach_eps;
 		var2[2][0] *= h_i * h_j / 2.0 / (t1 + mach_eps) / mach_eps;
+		break;
 	}
-	case 2: 
-	{
+	case 2: {
 		for (size_t i = 0; i < N_i; i++) {
 			for (size_t j = 0; j < N_i; j++) {
 				double l1 = e + (i + 0.5) * h_i,
@@ -161,15 +160,16 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 				type_A_v ker1 = (*function)((*function_x1)(t1, t2 * (1.0 + mach_eps), NULL, 0), (*function_x2)(t1, t2 * (1.0 + mach_eps), NULL, 0), (*function_x3)(t1, t2 * (1.0 + mach_eps), NULL, 0), (*function_x1)(l1, l2, NULL, 0), (*function_x2)(l1, l2, NULL, 0), (*function_x3)(l1, l2, NULL, 0));
 				type_A_v ker2 = (*function)((*function_x1)(t1, t2 * (1.0 - mach_eps), NULL, 0), (*function_x2)(t1, t2 * (1.0 - mach_eps), NULL, 0), (*function_x3)(t1, t2 * (1.0 - mach_eps), NULL, 0), (*function_x1)(l1, l2, NULL, 0), (*function_x2)(l1, l2, NULL, 0), (*function_x3)(l1, l2, NULL, 0));
 				double sq_det = sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, var1));
-				
+
 				var2[0][0] += (ker1 - ker2) * v[0][0] * sq_det;
 				var2[1][0] += (ker1 - ker2) * v[1][0] * sq_det;
-				var2[2][0] += (ker1 - ker2) * v[1][0] * sq_det;
+				var2[2][0] += (ker1 - ker2) * v[2][0] * sq_det;
 			}
 		}
 		var2[0][0] *= h_i * h_j / 2.0 / (t2 + mach_eps) / mach_eps;
 		var2[1][0] *= h_i * h_j / 2.0 / (t2 + mach_eps) / mach_eps;
 		var2[2][0] *= h_i * h_j / 2.0 / (t2 + mach_eps) / mach_eps;
+		break;
 	}
 	}
 	del(v);
@@ -218,8 +218,7 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 	type_div Sum = 0;
 
 	switch (k) {
-	case 0:
-	{
+	case 0: {
 		det_g((*function_x1), (*function_x2), (*function_x3), t1, t2, tensor);
 		det_g_reverse(tensor, tensor_reverse);
 		type_div** A_v_res;
@@ -231,17 +230,17 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 				A_v_res = createm<type_div>(3, 1);
 				x = createv<double>(3);
 
-				A_v(1, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res, t1, t2, down_index1, down_index2, up_index2);
+				A_v(2, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res, t1, t2, down_index1, down_index2, up_index2);
 				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1, t2, x);
 
-				Sum += mult(A_v_res, x) * tensor_reverse[mu][nu];
+				Sum += multv2(A_v_res, x) * tensor_reverse[mu][nu];
 
 				del(A_v_res); del(x);
 			}
 		}
+		break;
 	}
-	case 1:
-	{
+	case 1: {
 		double** tensor2 = createm<double>(M, N), ** tensor_reverse2 = createm<double>(M, N);
 
 		det_g((*function_x1), (*function_x2), (*function_x3), t1 * (1.0 + mach_eps), t2, tensor);
@@ -258,12 +257,12 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 				A_v_res1 = createm<type_div>(3, 1); A_v_res2 = createm<type_div>(3, 1);
 				x1 = createv<double>(3); x2 = createv<double>(3);
 
-				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res1, t1 * (1.0 + mach_eps), t2, down_index1, down_index2, up_index2);
-				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor2, A_v_res2, t1 * (1.0 - mach_eps), t2, down_index1, down_index2, up_index2);
+				A_v(2, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res1, t1 * (1.0 + mach_eps), t2, down_index1, down_index2, up_index2);
+				A_v(2, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor2, A_v_res2, t1 * (1.0 - mach_eps), t2, down_index1, down_index2, up_index2);
 				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1 * (1.0 + mach_eps), t2, x1);
 				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1 * (1.0 - mach_eps), t2, x2);
 				
-				Sum += (mult(A_v_res1, x1) * tensor_reverse[mu][nu] - mult(A_v_res2, x2) * tensor_reverse2[mu][nu]);
+				Sum += (multv2(A_v_res1, x1) * tensor_reverse[mu][nu] - multv2(A_v_res2, x2) * tensor_reverse2[mu][nu]);
 
 				del(A_v_res1); del(x1); 
 				del(A_v_res2); del(x2);
@@ -271,9 +270,9 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 		}
 		del(tensor2); del(tensor_reverse2);
 		Sum /= ((t1 + mach_eps) * mach_eps);
+		break;
 	}
-	case 2:
-	{
+	case 2: {
 		double** tensor2 = createm<double>(M, N), ** tensor_reverse2 = createm<double>(M, N);
 
 		det_g((*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 + mach_eps), tensor);
@@ -287,15 +286,15 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 		{
 			for (size_t nu = 0; nu < N; nu++)
 			{
-				A_v_res1 = createm<type_div>(3, 1); **A_v_res2 = createm<type_div>(3, 1);
+				A_v_res1 = createm<type_div>(3, 1); A_v_res2 = createm<type_div>(3, 1);
 				x1 = createv<double>(3); x2 = createv<double>(3);
 
-				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res1, t1, t2 * (1.0 + mach_eps), down_index1, down_index2, up_index2);
-				A_v(3, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor2, A_v_res2, t1, t2 * (1.0 - mach_eps), down_index1, down_index2, up_index2);
+				A_v(2, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res1, t1, t2 * (1.0 + mach_eps), down_index1, down_index2, up_index2);
+				A_v(2, mu + 1, k_c, (*function_x1), (*function_x2), (*function_x3), tensor2, A_v_res2, t1, t2 * (1.0 - mach_eps), down_index1, down_index2, up_index2);
 				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 + mach_eps), x1);
 				d_x(nu + 1, (*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 - mach_eps), x2);
 
-				Sum += (mult(A_v_res1, x1) * tensor_reverse[mu][nu] - mult(A_v_res2, x2) * tensor_reverse2[mu][nu]);
+				Sum += (multv2(A_v_res1, x1) * tensor_reverse[mu][nu] - multv2(A_v_res2, x2) * tensor_reverse2[mu][nu]);
 
 
 				del(A_v_res1); del(x1);
@@ -304,6 +303,7 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 		}
 		del(tensor2); del(tensor_reverse2);
 		Sum /= ((t2 + mach_eps) * mach_eps);
+		break;
 	}
 	}
 	return Sum;
@@ -336,7 +336,6 @@ inline void grad(double** tensor, double** tensor_reverse, double(*function_x1)(
 
 }
 
-
 template<typename type_S>
 inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int l, int i1, int i2, int j1, int j2) {
 	double a = A + i1 * h1, b = a + h1;
@@ -352,7 +351,7 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 		for (size_t j = 0; j < N_i; j++) {
 			double l1 = a + (i + 0.5) * h_i,
 				   l2 = c + (j + 0.5) * h_j;
-			grad_res = createv<type_S>(3);
+			grad_res = createv<type_S>(3, true);
 			A_v_res = createm<type_S>(3, 1);
 			v = createm<double>(3, 1);
 
@@ -364,7 +363,7 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 			Sum_ker[1] = grad_res[1] + k0 * k0 * A_v_res[1][0];
 			Sum_ker[2] = grad_res[2] + k0 * k0 * A_v_res[2][0];
 
-			Sum += mult(v, Sum_ker) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
+			Sum += multv1<type_S>(v, Sum_ker) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
 		}
 	}
 	return h_i * h_j * Sum;
