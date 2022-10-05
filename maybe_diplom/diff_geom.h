@@ -364,6 +364,34 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 			Sum_ker[2] = grad_res[2] + k0 * k0 * A_v_res[2][0];
 
 			Sum += multv1<type_S>(v, Sum_ker) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
+			del(v); del(A_v_res); del(grad_res);
+		}
+	}
+	return h_i * h_j * Sum;
+}
+
+template<typename type_f>
+inline type_f f(int N_i, double** tensor, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int i1, int i2) {
+	double a = A + i1 * h1, b = a + h1;
+	double c = C + i2 * h2, d = c + h2;
+
+	double h_i = (b - a) / N_i,
+		   h_j = (d - c) / N_i;
+
+	type_f Sum = 0;
+	double** v;
+	type_f* E0;
+	for (size_t i = 0; i < N_i; i++) {
+		for (size_t j = 0; j < N_i; j++) {
+			double l1 = a + (i + 0.5) * h_i,
+				   l2 = c + (j + 0.5) * h_j;
+			v = createm<double>(3, 1);
+			E0 = createv<type_f>(3);
+			base_func((*function_x1), (*function_x2), (*function_x3), l1, l2, i1, i2, 0, k, v);
+			func_cv((*function_x1)(l1, l2, NULL, 0), E0);
+
+			Sum += multv1<type_f>(v, E0) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
+			del(v); del(E0);
 		}
 	}
 	return h_i * h_j * Sum;

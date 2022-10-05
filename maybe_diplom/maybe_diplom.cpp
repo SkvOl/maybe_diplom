@@ -44,14 +44,17 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
         }
 }
 
-void mg(double**& var, size_t type, size_t dim_s = 1, int _step = 0) {
+
+
+void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
     //метод Галёркина
     //var - матрица, в которую будут записываться данные 
     //type - тип уравнения Фредгольма, первого или второго рода
     //dim_s - размер измерения в котором считается метод Галёркина
     size_t M = _msize(var) / sizeof(var[0]);
     size_t N = _msize(var[0]) / sizeof(var[0][0]);
-
+    double** tensor, **tensor_reverse;
+    short i1, i2, j1, j2, _k, _l;
     if (dim_s == 1) {
         for (size_t i = 0; i < M; i++) {
             double a = A + (i + _step) * h1, b = A + ((i + _step) + 1.0) * h1;
@@ -67,19 +70,25 @@ void mg(double**& var, size_t type, size_t dim_s = 1, int _step = 0) {
     else if (dim_s == 2) {
         int m = (int)sqrt(N - 1);
         for (size_t i = 0; i < M; i++) {
-            short i1 = (i + _step) / m, i2 = (i + _step) % m;
-            double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
-            double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
+            i1 = (i + _step) / m, i2 = (i + _step) % m;
+            _k = i + _step < (N - 1) / 2 ? 1 : 2;
+            //double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
+            //double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
+            
+            tensor = createm<double>(2, 2);
+            tensor_reverse = createm<double>(2, 2);
+            for (size_t j = 0; j < N; j++) {  
+                j1 = j / m, j2 = j % m;
+                _l = j + _step < (N - 1) / 2 ? 1 : 2;
+                
+                //double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
+                //double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
-            //printf("i=%d\n", i);
-            for (size_t j = 0; j < N; j++) {
-                short j1 = j / m, j2 = j % m;
-                double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
-                double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
-
-                var[i][j] = h1 * h2 * base_func(i + _step, j) * (type - 1.0) - lambda * In<double>(3, k, a, b, c, d, e, f, g, l);
+                //var[i][j] = h1 * h2 * base_func(i + _step, j) * (type - 1.0) - lambda * In<double>(3, k, a, b, c, d, e, f, g, l);
+                var[i][j] = h1 * h2 * base_func(i + _step, j) * (type - 1.0) - lambda * S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, _k, _l, i1, i2, j1, j2);
             }
-            var[i][N - 1] = In<double>(3, func, a, b, c, d);
+            //var[i][N - 1] = In<double>(3, func, a, b, c, d);
+            var[i][N - 1] = f<complex<double>>(1, tensor, x1_screen, x2_screen, x3_screen, _k, i1, i2);          
         }
     }
     else if (dim_s == 3) {
@@ -135,7 +144,7 @@ int main2() {
         _step += count_one_rank[i];
     /// подготовительные работы
 
-    double** a = createm<double>(count_one_rank[_rank], _N + 1);
+    complex<double>** a = createm<complex<double>>(count_one_rank[_rank], _N + 1);
 
     double t1 = MPI_Wtime();
     mg(a, 2, 2, _step);
@@ -151,7 +160,7 @@ int main2() {
     fflush(stdout);
     
     
-    double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
+    complex<double>* part_res = createv<complex<double>>(count_one_rank[_rank]), * res = NULL;
     int* arr_step = NULL;
 
     
@@ -162,7 +171,7 @@ int main2() {
     if (_rank == 0) {
         del(a);
 
-        res = createv<double>(_N);
+        res = createv<complex<double>>(_N);
         arr_step = createv<int>(_size);
 
         for (size_t i = 0; i < _size; i++) {
@@ -173,7 +182,7 @@ int main2() {
         }
     }
     MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE, res, count_one_rank, arr_step, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE_COMPLEX, res, count_one_rank, arr_step, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD);
 
     if (_rank == 0) 
         for (size_t i = 0; i < _N; i++) {
@@ -185,166 +194,166 @@ int main2() {
     MPI_Finalize();
 }
 
-int main3g() {
-    return 0;
-    _N *= _n;
-    int _rank, _size;
+//int main3g() {
+//    return 0;
+//    _N *= _n;
+//    int _rank, _size;
+//
+//    MPI_Init(NULL, NULL);
+//    MPI_Comm_size(MPI_COMM_WORLD, &_size);
+//    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+//    MPI_Status status;
+//    MPI_Request request;
+//
+//    /// подготовительные работы
+//    int* count_one_rank = createv<int>(_size),* arr_step = createv<int>(_size);
+//
+//    //массив количества элементов на каждом ранге
+//    for (size_t i = 0; i < _size; i++)
+//        count_one_rank[i] = _N / _size;
+//
+//    short mod = _N % _size;
+//    if (mod != 0)
+//        for (short i = _size - 1; i >= 0; i--) {
+//            count_one_rank[i]++;
+//            mod--;
+//            if (mod == 0) break;
+//        }
+//    //массив количества элементов на каждом ранге
+//    //массив шагов для каждого ранга
+//    for (size_t i = 0; i < _size; i++) {
+//        arr_step[i] = 0;
+//
+//        for (size_t j = 0; j < i; j++)
+//            arr_step[i] += count_one_rank[j];
+//    }
+//    //массив шагов для каждого ранга
+//    /// подготовительные работы
+//
+//    double** a = createm<double>(count_one_rank[_rank], _N + 1);
+//
+//    double t1 = MPI_Wtime();
+//    mg(a, 2, 3, arr_step[_rank]);
+//    double t2 = MPI_Wtime() - t1;
+//    printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
+//    fflush(stdout);
+//    //if (_rank == 0) print(a);
+//
+//    t1 = MPI_Wtime();
+//    gm(a, count_one_rank, arr_step[_rank], _rank, _size);
+//    t2 = MPI_Wtime() - t1;
+//    printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
+//    fflush(stdout);
+//
+//
+//    double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
+//
+//
+//    for (size_t i = 0; i < count_one_rank[_rank]; i++)
+//        part_res[i] = a[i][_N];
+//
+//
+//    if (_rank == 0) {
+//        del(a);
+//        res = createv<double>(_N);
+//    }
+//    MPI_Barrier(MPI_COMM_WORLD);
+//    MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE, res, count_one_rank, arr_step, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+//
+//    if (_rank == 0)
+//        for (size_t i = 0; i < _N; i++) {
+//            printf("%f\n", res[i]);
+//        }
+//
+//
+//    MPI_Finalize();
+//}
 
-    MPI_Init(NULL, NULL);
-    MPI_Comm_size(MPI_COMM_WORLD, &_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
-    MPI_Status status;
-    MPI_Request request;
-
-    /// подготовительные работы
-    int* count_one_rank = createv<int>(_size),* arr_step = createv<int>(_size);
-
-    //массив количества элементов на каждом ранге
-    for (size_t i = 0; i < _size; i++)
-        count_one_rank[i] = _N / _size;
-
-    short mod = _N % _size;
-    if (mod != 0)
-        for (short i = _size - 1; i >= 0; i--) {
-            count_one_rank[i]++;
-            mod--;
-            if (mod == 0) break;
-        }
-    //массив количества элементов на каждом ранге
-    //массив шагов для каждого ранга
-    for (size_t i = 0; i < _size; i++) {
-        arr_step[i] = 0;
-
-        for (size_t j = 0; j < i; j++)
-            arr_step[i] += count_one_rank[j];
-    }
-    //массив шагов для каждого ранга
-    /// подготовительные работы
-
-    double** a = createm<double>(count_one_rank[_rank], _N + 1);
-
-    double t1 = MPI_Wtime();
-    mg(a, 2, 3, arr_step[_rank]);
-    double t2 = MPI_Wtime() - t1;
-    printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
-    fflush(stdout);
-    //if (_rank == 0) print(a);
-
-    t1 = MPI_Wtime();
-    gm(a, count_one_rank, arr_step[_rank], _rank, _size);
-    t2 = MPI_Wtime() - t1;
-    printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
-    fflush(stdout);
-
-
-    double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
-
-
-    for (size_t i = 0; i < count_one_rank[_rank]; i++)
-        part_res[i] = a[i][_N];
-
-
-    if (_rank == 0) {
-        del(a);
-        res = createv<double>(_N);
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE, res, count_one_rank, arr_step, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-    if (_rank == 0)
-        for (size_t i = 0; i < _N; i++) {
-            printf("%f\n", res[i]);
-        }
-
-
-    MPI_Finalize();
-}
-
-int main3si() {
-    return 0;
-    //проверка правильности работы параллельного метода простой итерации
-    _N *= _n;
-    int _rank, _size;
-
-    MPI_Init(NULL, NULL);
-    MPI_Comm_size(MPI_COMM_WORLD, &_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
-    MPI_Status status;
-    MPI_Request request;
-
-    /// подготовительные работы
-    int* count_one_rank = createv<int>(_size), * arr_step = createv<int>(_size);
-    //массив количества элементов на каждом ранге
-    for (size_t i = 0; i < _size; i++)
-        count_one_rank[i] = _N / _size;
-
-    short mod = _N % _size;
-    if (mod != 0)
-        for (short i = _size - 1; i >= 0; i--) {
-            count_one_rank[i]++;
-            mod--;
-            if (mod == 0) break;
-        }
-    //массив количества элементов на каждом ранге
-    //массив шагов для каждого ранга
-    for (size_t i = 0; i < _size; i++) {
-        arr_step[i] = 0;
-
-        for (size_t j = 0; j < i; j++)
-            arr_step[i] += count_one_rank[j];
-    }
-    //массив шагов для каждого ранга
-    /// подготовительные работы
-
-    double** a = createm<double>(count_one_rank[_rank], _N + 1), * init = createv<double>(_N);
-    double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
-
-    init[0] = 0.6;
-    init[1] = 1.2;
-    init[2] = 1.2;
-    init[3] = 1.7;
-    init[4] = 1.2;
-    init[5] = 1.7;
-    init[6] = 1.7;
-    init[7] = 1.9;
-
-    double t1 = MPI_Wtime();
-    mg(a, 2, 3, arr_step[_rank]);
-    double t2 = MPI_Wtime() - t1;
-    //printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
-    fflush(stdout);
-    //if (_rank == 0) print(a);
-
-    t1 = MPI_Wtime();
-    //gm(a, count_one_rank, arr_step[_rank], _rank, _size);
-    part_res = simple_iteration(a, init, 2, count_one_rank, arr_step, _rank, _size);
-    t2 = MPI_Wtime() - t1;
-    //printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
-    fflush(stdout);
-
-
-    
-
-
-    /*for (size_t i = 0; i < count_one_rank[_rank]; i++)
-        part_res[i] = a[i][_N];*/
-
-
-    if (_rank == 0) {
-        del(a);
-        res = createv<double>(_N);
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE, res, count_one_rank, arr_step, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-    if (_rank == 0)
-        for (size_t i = 0; i < _N; i++) {
-            printf("%f\n", res[i]);
-        }
-
-
-    MPI_Finalize();
-}
+//int main3si() {
+//    return 0;
+//    //проверка правильности работы параллельного метода простой итерации
+//    _N *= _n;
+//    int _rank, _size;
+//
+//    MPI_Init(NULL, NULL);
+//    MPI_Comm_size(MPI_COMM_WORLD, &_size);
+//    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+//    MPI_Status status;
+//    MPI_Request request;
+//
+//    /// подготовительные работы
+//    int* count_one_rank = createv<int>(_size), * arr_step = createv<int>(_size);
+//    //массив количества элементов на каждом ранге
+//    for (size_t i = 0; i < _size; i++)
+//        count_one_rank[i] = _N / _size;
+//
+//    short mod = _N % _size;
+//    if (mod != 0)
+//        for (short i = _size - 1; i >= 0; i--) {
+//            count_one_rank[i]++;
+//            mod--;
+//            if (mod == 0) break;
+//        }
+//    //массив количества элементов на каждом ранге
+//    //массив шагов для каждого ранга
+//    for (size_t i = 0; i < _size; i++) {
+//        arr_step[i] = 0;
+//
+//        for (size_t j = 0; j < i; j++)
+//            arr_step[i] += count_one_rank[j];
+//    }
+//    //массив шагов для каждого ранга
+//    /// подготовительные работы
+//
+//    double** a = createm<double>(count_one_rank[_rank], _N + 1), * init = createv<double>(_N);
+//    double* part_res = createv<double>(count_one_rank[_rank]), * res = NULL;
+//
+//    init[0] = 0.6;
+//    init[1] = 1.2;
+//    init[2] = 1.2;
+//    init[3] = 1.7;
+//    init[4] = 1.2;
+//    init[5] = 1.7;
+//    init[6] = 1.7;
+//    init[7] = 1.9;
+//
+//    double t1 = MPI_Wtime();
+//    mg(a, 2, 3, arr_step[_rank]);
+//    double t2 = MPI_Wtime() - t1;
+//    //printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
+//    fflush(stdout);
+//    //if (_rank == 0) print(a);
+//
+//    t1 = MPI_Wtime();
+//    //gm(a, count_one_rank, arr_step[_rank], _rank, _size);
+//    part_res = simple_iteration(a, init, 2, count_one_rank, arr_step, _rank, _size);
+//    t2 = MPI_Wtime() - t1;
+//    //printf("rank: %d  time Gauss method is: %f\n", _rank, t2);
+//    fflush(stdout);
+//
+//
+//    
+//
+//
+//    /*for (size_t i = 0; i < count_one_rank[_rank]; i++)
+//        part_res[i] = a[i][_N];*/
+//
+//
+//    if (_rank == 0) {
+//        del(a);
+//        res = createv<double>(_N);
+//    }
+//    MPI_Barrier(MPI_COMM_WORLD);
+//    MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE, res, count_one_rank, arr_step, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+//
+//    if (_rank == 0)
+//        for (size_t i = 0; i < _N; i++) {
+//            printf("%f\n", res[i]);
+//        }
+//
+//
+//    MPI_Finalize();
+//}
 
 
 
@@ -385,10 +394,13 @@ int /*main*/Проверка_интеграла() {
     return 0;
     //double** tensor = createm<double>(2, 2);
     //cout << "I2: " << I(100, x1_screen, x2_screen, x3_screen, tensor, -pi / 2.0, pi / 2.0, 0.0, 2.0 * pi) << "\n\n";
+
+    //double** tensor = createm<double>(2, 2), ** tensor_reverse = createm<double>(2, 2);
+    //cout << "INTEGRAL: " << S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, 1, 2, 1, 1, 1, 1) << "\n\n";
+    //
+    //cout << "F INTEGRAL: " << f<complex<double>>(1, tensor, x1_screen, x2_screen, x3_screen, 1, 1, 1) << "\n";
 }
 
-
 int main() {
-    double** tensor = createm<double>(2, 2), ** tensor_reverse = createm<double>(2, 2);
-    cout <<"INTEGRAL: " << S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, 1, 2, 1, 1, 1, 1) << "\n";
+    cout << "hello world";
 }

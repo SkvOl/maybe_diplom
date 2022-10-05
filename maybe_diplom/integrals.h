@@ -26,14 +26,26 @@ inline complex<double> k_c(double x1, ...) {
     r.real() < 0.0001 ? r += mach_eps : r = r;
     return exp(i * K * r) / pi4 / r;
 }
+
 inline complex<double> func_c(double x1, ...) {
     va_list args;
     va_start(args, x1);
     //complex<double> x2 = va_arg(args, complex<double>);
     va_end(args);
 
-    complex<double> i_k_x(0, k0 * x1);
-    return exp(i_k_x);
+    complex<double> i_k_x(0, x1);
+    return exp(i_k_x*k0);
+}
+
+inline void func_cv(double x1, ...) {
+    va_list args;
+    va_start(args, x1);
+    complex<double>* var = va_arg(args, complex<double>*);
+    va_end(args);
+
+    var[0] = 0;
+    var[1] = complex<double>(0, x1) * k0;
+    var[2] = 0;
 }
 
 
