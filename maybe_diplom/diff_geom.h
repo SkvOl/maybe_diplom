@@ -358,7 +358,7 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 			grad(tensor, tensor_reverse, (*function_x1), (*function_x2), (*function_x3), l1, l2, j1, j2, l, grad_res);
 			A_v(N_i, 0, k_c, (*function_x1), (*function_x2), (*function_x3), tensor, A_v_res, l1, l2, j1, j2, l);
 			base_func((*function_x1), (*function_x2), (*function_x3), l1, l2, i1, i2, 0, k, v);
-
+			
 			Sum_ker[0] = grad_res[0] + k0 * k0 * A_v_res[0][0];
 			Sum_ker[1] = grad_res[1] + k0 * k0 * A_v_res[1][0];
 			Sum_ker[2] = grad_res[2] + k0 * k0 * A_v_res[2][0];
@@ -389,6 +389,7 @@ inline type_f f(int N_i, double** tensor, double(*function_x1)(double, double, d
 			E0 = createv<type_f>(3);
 			base_func((*function_x1), (*function_x2), (*function_x3), l1, l2, i1, i2, 0, k, v);
 			func_cv((*function_x1)(l1, l2, NULL, 0), E0);
+			
 
 			Sum += multv1<type_f>(v, E0) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
 			del(v); del(E0);

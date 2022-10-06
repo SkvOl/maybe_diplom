@@ -74,7 +74,11 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
             _k = i + _step < (N - 1) / 2 ? 1 : 2;
             //double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
             //double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
-            
+
+            if (_step == 0) {
+                printf("%d\n", i);
+                fflush(stdout);
+            }
             tensor = createm<double>(2, 2);
             tensor_reverse = createm<double>(2, 2);
             for (size_t j = 0; j < N; j++) {  
@@ -85,7 +89,8 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
                 //double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
                 //var[i][j] = h1 * h2 * base_func(i + _step, j) * (type - 1.0) - lambda * In<double>(3, k, a, b, c, d, e, f, g, l);
-                var[i][j] = h1 * h2 * base_func(i + _step, j) * (type - 1.0) - lambda * S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, _k, _l, i1, i2, j1, j2);
+                var[i][j] = lambda * S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, _k, _l, i1, i2, j1, j2);
+                
             }
             //var[i][N - 1] = In<double>(3, func, a, b, c, d);
             var[i][N - 1] = f<complex<double>>(1, tensor, x1_screen, x2_screen, x3_screen, _k, i1, i2);          
@@ -115,8 +120,8 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
 }
 
 
-int main2() {
-    return 0;
+int main() {
+    //return 0;
     int _rank, _size;
     
     MPI_Init(NULL, NULL);
@@ -151,7 +156,7 @@ int main2() {
     double t2 = MPI_Wtime() - t1;
     printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
     fflush(stdout);
-    //if (_rank == 0)print(a);
+    if (_rank == 0)print(a);
 
     t1 = MPI_Wtime();
     gm(a, count_one_rank, _step, _rank, _size);
@@ -184,11 +189,18 @@ int main2() {
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE_COMPLEX, res, count_one_rank, arr_step, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD);
 
-    if (_rank == 0) 
+    if (_rank == 0) {
+        ofstream file1("res1.txt", ios_base::out);
+        file1 << "t1 " << "t2 " << "t3 " << "v\n";
+        short i1, i2;
         for (size_t i = 0; i < _N; i++) {
-            if (i % _n == 0 && i != 0) printf("\n");
-            printf("%f ", res[i]);
-        }  
+            i1 = i / _n; i2 = i % _n;
+            /*if (i % _n == 0 && i != 0) printf("\n");
+            cout << abs(res[i]) << " ";*/
+            file1 << A + (i1 + 0.5) * h1 << " " << C + (i2 + 0.5) * h2 << " " << 0 << " " << abs(res[i]) << "\n";
+        }
+        file1.close();
+    }
 
 
     MPI_Finalize();
@@ -399,8 +411,4 @@ int /*main*/Проверка_интеграла() {
     //cout << "INTEGRAL: " << S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, 1, 2, 1, 1, 1, 1) << "\n\n";
     //
     //cout << "F INTEGRAL: " << f<complex<double>>(1, tensor, x1_screen, x2_screen, x3_screen, 1, 1, 1) << "\n";
-}
-
-int main() {
-    cout << "hello world";
 }
