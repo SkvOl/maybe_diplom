@@ -175,6 +175,10 @@ string gm(type_gm** var, int* count_one_rank = NULL, int _step = 0, int _rank = 
 
 
 	for (size_t _k = 0; _k < N - 1; _k++) {
+		if (_rank == 0) {
+			printf("k: %d\n", _k);
+			fflush(stdout);
+		}
 		type_gm ed = 1;
 		if (_k >= _step && _k < _step + count_one_rank[_rank]) {
 			if (var[_k - _step][_k] != ed) {

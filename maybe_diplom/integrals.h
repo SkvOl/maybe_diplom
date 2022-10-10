@@ -23,7 +23,7 @@ inline complex<double> k_c(double x1, ...) {
 
 
     complex<double> i(0, 1), K = k0, r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2) + pow(x3 - y3, 2)), pi4 = 4.0 * pi;
-    r.real() < 0.0001 ? r += mach_eps : r = r;
+    r.real() < 0.01 ? r += mach_eps*10: r = r;
     return exp(i * K * r) / pi4 / r;
 }
 
@@ -191,24 +191,24 @@ inline void base_func(double* var,...) {
     }*/
 }
 
-inline void base_func(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int),double t1, double t2, int down_index1, int down_index2, int up_index1, int up_index2, double **var) {
+inline void base_func(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, int down_index1, int down_index2, int up_index1, int up_index2, double** var) {
     double** J = createm<double>(3, 2), ** v_vec = createm<double>(2, 1);
     Jacobian((*function_x1), (*function_x2), (*function_x3), t1, t2, J);
     double d1, d2, d3, d4;
     if (up_index2 == 1) {
-        d1 = h1 * down_index1, d2 = h1 * (down_index1 + 2.0), d3 = h2 * down_index2, d4 = h2 * (down_index2 + 1.0);
-        v_vec[0][0] = d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t1 - h1 * (down_index1 + 1.0)) / h1 / 1.0 : 0.0;
+        d1 = A + h1 * down_index1, d2 = d1 + 2.0 * h1, d3 = C + h2 * down_index2, d4 = d3 + h2;
+        v_vec[0][0] = d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t1 - A - h1 * (down_index1 + 1.0)) / h1 / 1.0 : 0.0;
         v_vec[1][0] = 0.0;
     }
     else {
-        d1 = h1 * down_index1, d2 = h1 * (down_index1 + 1.0), d3 = h2 * down_index2, d4 = h2 * (down_index2 + 2.0);
+        d1 = A + h1 * down_index1, d2 = d1 + h1, d3 = C + h2 * down_index2, d4 = d3 + 2.0 * h2;
         v_vec[0][0] = 0.0;
-        v_vec[1][0] = d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t2 - h2 * (down_index2 + 1.0)) / h2 / 1.0 : 0.0;
+        v_vec[1][0] = d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t2 - C - h2 * (down_index2 + 1.0)) / h2 / 1.0 : 0.0;
     }
 
     mult(J, v_vec, var);
 
-    del(J); 
+    del(J);
     del(v_vec);
 }
 

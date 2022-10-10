@@ -341,6 +341,7 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 	double a = A + i1 * h1, b = a + h1;
 	double c = C + i2 * h2, d = c + h2;
 
+
 	double h_i = (b - a) / N_i,
 		   h_j = (d - c) / N_i;
 
@@ -351,6 +352,7 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 		for (size_t j = 0; j < N_i; j++) {
 			double l1 = a + (i + 0.5) * h_i,
 				   l2 = c + (j + 0.5) * h_j;
+			//cout << l1 << " " << l2 << "\n";
 			grad_res = createv<type_S>(3, true);
 			A_v_res = createm<type_S>(3, 1);
 			v = createm<double>(3, 1);

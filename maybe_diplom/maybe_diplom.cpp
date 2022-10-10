@@ -156,7 +156,7 @@ int main() {
     double t2 = MPI_Wtime() - t1;
     printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
     fflush(stdout);
-    if (_rank == 0)print(a);
+    //if (_rank == 0)print(a);
 
     t1 = MPI_Wtime();
     gm(a, count_one_rank, _step, _rank, _size);
@@ -190,14 +190,17 @@ int main() {
     MPI_Gatherv(part_res, count_one_rank[_rank], MPI_DOUBLE_COMPLEX, res, count_one_rank, arr_step, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD);
 
     if (_rank == 0) {
-        ofstream file1("res1.txt", ios_base::out);
-        file1 << "t1 " << "t2 " << "t3 " << "v\n";
+        ofstream file1("res.txt", ios_base::out);
+        file1 << "x1 " << "x2 " << "x3 " << "v\n";
         short i1, i2;
+        double t1, t2;
         for (size_t i = 0; i < _N; i++) {
             i1 = i / _n; i2 = i % _n;
+            t1 = A + (i1 + 0.5) * h1;
+            t2 = C + (i2 + 0.5) * h2;
             /*if (i % _n == 0 && i != 0) printf("\n");
             cout << abs(res[i]) << " ";*/
-            file1 << A + (i1 + 0.5) * h1 << " " << C + (i2 + 0.5) * h2 << " " << 0 << " " << abs(res[i]) << "\n";
+            file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << abs(res[i]) << "\n";
         }
         file1.close();
     }
@@ -280,7 +283,7 @@ int main() {
 //
 //    MPI_Finalize();
 //}
-
+//
 //int main3si() {
 //    return 0;
 //    //проверка правильности работы параллельного метода простой итерации
@@ -369,31 +372,30 @@ int main() {
 
 
 
-int /*main*/Проверка_базисной_функции() {
+int /*main*/Проверка_базисной_функции () {
     return 0;
-    double _A = -pi / 2.0, _B = pi / 2.0;
-    double _C = 0.0, _D = 2.0 * pi;
+
     double num_t = 1005.0;
-    h1 = (_B - _A) / 4.0;
-    h2 = (_D - _C) / 4.0;
+    h1 = (B - A) / 4.0;
+    h2 = (D - C) / 4.0;
 
     cout << h1 << " " << h2 << "\n";
     
     ofstream file1("v1.txt", ios_base::out);
-    file1 << "t1 " << "t2 " << "t3 " << "v\n";
+    file1 << "x1 " << "x2 " << "x3 " << "v\n";
 
     ofstream file2("v2.txt", ios_base::out);
-    file2 << "t1 " << "t2 " << "t3 " << "v\n";
+    file2 << "x1 " << "x2 " << "x3 " << "v\n";
 
     ofstream file3("v3.txt", ios_base::out);
-    file3 << "t1 " << "t2 " << "t3 " << "v\n";
-    for (double t1 = _A; t1 < _B; t1 += (_B - _A) / num_t) {
-        for (double t2 = _C; t2 < _D; t2 += (_D - _C) / num_t) {
+    file3 << "x1 " << "x2 " << "x3 " << "v\n";
+    for (double t1 = A; t1 < B; t1 += (B - A) / num_t) {
+        for (double t2 = C; t2 < D; t2 += (D - C) / num_t) {
             double** res = createm<double>(3, 1);
             base_func(x1_screen, x2_screen, x3_screen, t1, t2, 1, 1, 0, 2, res);
-            file1 << t1 << " " << t2 << " " << 0 << " " << res[0][0] << "\n";
-            file2 << t1 << " " << t2 << " " << 0 << " " << res[1][0] << "\n";
-            file3 << t1 << " " << t2 << " " << 0 << " " << res[2][0] << "\n";
+            file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[0][0] << "\n";
+            file2 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[1][0] << "\n";
+            file3 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[2][0] << "\n";
             del(res);
         }
     }
@@ -402,13 +404,14 @@ int /*main*/Проверка_базисной_функции() {
     file3.close();
 }
 
-int /*main*/Проверка_интеграла() {
-    return 0;
-    //double** tensor = createm<double>(2, 2);
-    //cout << "I2: " << I(100, x1_screen, x2_screen, x3_screen, tensor, -pi / 2.0, pi / 2.0, 0.0, 2.0 * pi) << "\n\n";
+//int /*main*/Проверка_интеграла() {
+//    return 0;
+//    double** tensor = createm<double>(2, 2);
+//    cout << "I2: " << I(100, x1_screen, x2_screen, x3_screen, tensor, -pi / 2.0, pi / 2.0, 0.0, 2.0 * pi) << "\n\n";
+//
+//    double** tensor = createm<double>(2, 2), ** tensor_reverse = createm<double>(2, 2);
+//    cout << "INTEGRAL: " << S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, 1, 2, 1, 1, 1, 1) << "\n\n";
+//    
+//    cout << "F INTEGRAL: " << f<complex<double>>(1, tensor, x1_screen, x2_screen, x3_screen, 1, 1, 1) << "\n";
+//}
 
-    //double** tensor = createm<double>(2, 2), ** tensor_reverse = createm<double>(2, 2);
-    //cout << "INTEGRAL: " << S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, 1, 2, 1, 1, 1, 1) << "\n\n";
-    //
-    //cout << "F INTEGRAL: " << f<complex<double>>(1, tensor, x1_screen, x2_screen, x3_screen, 1, 1, 1) << "\n";
-}
