@@ -156,7 +156,7 @@ int main() {
     double t2 = MPI_Wtime() - t1;
     printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
     fflush(stdout);
-    //if (_rank == 0)print(a);
+    if (_rank == 0)print(a, "g", 10, 10);
 
     t1 = MPI_Wtime();
     gm(a, count_one_rank, _step, _rank, _size);
@@ -198,8 +198,8 @@ int main() {
             i1 = i / _n; i2 = i % _n;
             t1 = A + (i1 + 0.5) * h1;
             t2 = C + (i2 + 0.5) * h2;
-            /*if (i % _n == 0 && i != 0) printf("\n");
-            cout << abs(res[i]) << " ";*/
+            if (i % _n == 0 && i != 0) printf("\n");
+            cout << abs(res[i]) * pow(10, 7) << " ";
             file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << abs(res[i]) << "\n";
         }
         file1.close();

@@ -44,7 +44,7 @@ inline void func_cv(double x1, ...) {
     va_end(args);
 
     var[0] = 0;
-    var[1] = complex<double>(0, x1) * k0;
+    var[1] = exp(complex<double>(0, x1) * k0);
     var[2] = 0;
 }
 
@@ -204,6 +204,7 @@ inline void base_func(double(*function_x1)(double, double, double*, int), double
         d1 = A + h1 * down_index1, d2 = d1 + h1, d3 = C + h2 * down_index2, d4 = d3 + 2.0 * h2;
         v_vec[0][0] = 0.0;
         v_vec[1][0] = d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t2 - C - h2 * (down_index2 + 1.0)) / h2 / 1.0 : 0.0;
+        //cout << d1 << " " << d2 << " " << d3 << " " << d4 << "\n";
     }
 
     mult(J, v_vec, var);
