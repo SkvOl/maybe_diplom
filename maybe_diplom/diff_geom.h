@@ -373,7 +373,7 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 }
 
 template<typename type_f>
-inline type_f f(int N_i, double** tensor, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int i1, int i2) {
+inline type_f f_vec(int N_i, double** tensor, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int i1, int i2) {
 	double a = A + i1 * h1, b = a + h1;
 	double c = C + i2 * h2, d = c + h2;
 

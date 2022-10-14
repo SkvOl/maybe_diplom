@@ -93,7 +93,7 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
                 
             }
             //var[i][N - 1] = In<double>(3, func, a, b, c, d);
-            var[i][N - 1] = f<complex<double>>(1, tensor, x1_screen, x2_screen, x3_screen, _k, i1, i2);          
+            var[i][N - 1] = f_vec<complex<double>>(1, tensor, x1_screen, x2_screen, x3_screen, _k, i1, i2);          
         }
     }
     else if (dim_s == 3) {
