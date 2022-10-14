@@ -6,26 +6,30 @@
 
 const double mach_eps = sqrt(2.22045e-16);
 const double pi = acos(-1);
-const double k0 = 1, k1 = 1.5 * k0;
+const double k0 = 2.0 * pi / (3 * pow(10, 10)) * (5 * pow(10, 10)), k1 = 1.5 * k0;
 const double R = 5;
 const double lambda = 1.0;
 
 //Для комплексных нужно переопределять 
-inline complex<double> k_c(double y1, ...) {
-    double y2, x1, x2;
+inline complex<double> k_c(double x1, ...) {
+    double x2, x3, y1, y2, y3;
     va_list args;
 
-    va_start(args, y1);
-    y2 = va_arg(args, double);
-    x1 = va_arg(args, double);
+    va_start(args, x1);
     x2 = va_arg(args, double);
+    x3 = va_arg(args, double);
 
+    y1 = va_arg(args, double);
+    y2 = va_arg(args, double);
+    y3 = va_arg(args, double);
     va_end(args);
 
 
-    complex<double> i(0, 1), K(k0, 0), r(sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2)), 0), pi4(4 * pi, 0);
-    return exp(i * K * r) / pi4 / r;
+    complex<double> i(0, 1), K = k0, r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2) + pow(x3 - y3, 2)), pi4 = 4.0 * pi;
+    r.real() < 0.01 ? r += mach_eps * 10 : r = r;
+    return exp(i * K * r) / r;
 }
+
 inline complex<double> func_c(double x1, ...) {
     va_list args;
     va_start(args, x1);
@@ -36,6 +40,17 @@ inline complex<double> func_c(double x1, ...) {
     return exp(i_k_x);
 }
 
+complex<double> fallWave_1(double k, double x, double y) {
+    complex <double> ed(0, 1.0);
+    return exp(ed * k * x);
+}
+
+inline complex<double> fallWave_1(double x1, ...) {
+    va_list args;
+    va_start(args, x1);
+    va_end(args);
+    return exp(complex <double> (0, k1 * x1));
+}
 
 inline complex<double> In_c(int N_i, complex<double>(*function)(double, ...), double a, double b, double c, double d, double e, double f, double g, double h) {
     //четырёхмерный интеграл

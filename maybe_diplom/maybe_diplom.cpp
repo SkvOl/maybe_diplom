@@ -3,12 +3,12 @@
 #include <stdio.h> 
 
 
-int n = 4, N = n * n;
+int n = 20, N = n * n;
 
 
 //отрезок для n мерных интегральных уравнений
-double A = 0, B = 1;
-double C = 0, D = 1;
+double A = 0, B = 5;
+double C = 0, D = 5;
 double E = 0, F = 1;
 
 //шаг для n мерных интегральных уравнений
@@ -57,7 +57,7 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
         }
 }
 
-void mg(double**& var, size_t type, size_t dim_s = 1) {
+void mg(complex<double>**& var, size_t type, size_t dim_s = 1) {
     //метод Галёркина
     //var - матрица, в которую будут записываться данные 
     //type - тип уравнения Фредгольма, первого или второго рода
@@ -83,15 +83,15 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
             double a = A + i1 * h1, b = A + (i1 + 1.0) * h1;
             double c = C + i2 * h2, d = C + (i2 + 1.0) * h2;
 
-            //printf("i=%d\n", i);
+            printf("i=%d\n", i);
             for (size_t j = 0; j < M; j++) {
                 short j1 = j / m, j2 = j % m;
                 double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
-                var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * In<double>(10, k, a, b, c, d, e, f, g, l);
+                var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * (k0 * k0 - k1 * k1) * In_c(10, k_c, a, b, c, d, e, f, g, l);
             }
-            var[i][M] = In<double>(100, func, a, b, c, d);
+            var[i][M] = In_c(100, fallWave_1, a, b, c, d);
         }
     }
     else if (dim_s == 3) {
@@ -119,35 +119,35 @@ void mg(double**& var, size_t type, size_t dim_s = 1) {
 }
 
 
-int main1()
-{
-    return 0;
-    double** a = createm<double>(n, n + 1.0);
+//int main1()
+//{
+//    return 0;
+//    double** a = createm<double>(n, n + 1.0);
+//
+//
+//    mg(a, 2);
+//    space(1);
+//    print(a);
+//
+//    cout << gm(a) << "\n";
+//
+//
+//    space(1);
+//
+//
+//    for (size_t i = 0; i < n; i++)
+//    {
+//        //printf("%f %f\n", a[i][n], u(A + (i + 0.5) * h1));
+//    }
+//}
 
-
-    mg(a, 2);
-    space(1);
-    print(a);
-
-    cout << gm(a) << "\n";
-
-
-    space(1);
-
-
-    for (size_t i = 0; i < n; i++)
-    {
-        //printf("%f %f\n", a[i][n], u(A + (i + 0.5) * h1));
-    }
-}
-
-int main2() {
-    return 0;
-    double **a = createm<double>(N, N + 1.0), **a1 = createm<double>(N, N + 1.0);
+int main() {
+    //return 0;
+    complex<double>** a = createm<complex<double>>(N, N + 1.0);// , ** a1 = createm<double>(N, N + 1.0);
 
     mg(a, 2.0, 2);
     
-    mk(a1, 2.0, 2);
+    //mk(a1, 2.0, 2);
 
     //printf("mg\n");
     //print(a);
@@ -161,7 +161,7 @@ int main2() {
     gm(a);
 
 
-    gm(a1);
+    //gm(a1);
 
     space(1);
 
@@ -169,51 +169,53 @@ int main2() {
     for (size_t i = 0; i < N; i++)
     {
         if (i % n == 0 && i != 0) printf("\n");
-        printf("%f ", a[i][N]);
+        //printf("%f ", a[i][N]);
+        cout << a[i][N] << " ";
         
     }
-    space(1);
+    //space(1);
 
-    printf("mk\n");
-    for (size_t i = 0; i < N; i++)
-    {
-        /*short i1 = i / n, i2 = i % n;
-        double ksi1 = A + (i1 + 0.5) * h1, ksi2 = A + (i2 + 0.5) * h2;
+    //printf("mk\n");
+    //for (size_t i = 0; i < N; i++)
+    //{
+    //    /*short i1 = i / n, i2 = i % n;
+    //    double ksi1 = A + (i1 + 0.5) * h1, ksi2 = A + (i2 + 0.5) * h2;
 
-        printf("%f %f %f\n", ksi1, ksi2, a1[i][N]);*/
-        
-        if (i % n == 0 && i != 0) printf("\n");
-        printf("%f ", a1[i][N]);
-    }
+    //    printf("%f %f %f\n", ksi1, ksi2, a1[i][N]);*/
+    //    
+    //    if (i % n == 0 && i != 0) printf("\n");
+    //    printf("%f ", a1[i][N]);
+    //}
 
 }
 
-int main() {
-    N *= n;
-
-    double** a = createm<double>(N, N + 1);
-
-    mg(a, 2, 3);
-
-    //print(a,"g");
-
-    gm(a);
-    double err_M = 0, err;
-    for (size_t i = 0; i < N; i++)
-    {
-        short i1 = i % n, i2 = i / n - n * (i / n / n), i3 = i / n / n;
-        err = fabs(u(A + (i1 + 0.5) * h1, C + (i2 + 0.5) * h2, E + (i3 + 0.5) * h3) - a[i][N]);
-        if (err_M < err) err_M = err;
-        printf("%f %f err=%f\n", u(A + (i1 + 0.5) * h1, C + (i2 + 0.5) * h2, E + (i3 + 0.5) * h3), a[i][N], err);
-    }
-    printf("\nMax err: %f", err_M);
-    //max1=0.287156 max2=0.287156 sr1=0.085879 sr2=0.085879 n=2
-    //max1=0.562298 max2=0.548107 sr1=0.099824 sr2=0.098840 n=3
-    //max1=0.924069 max2=0.743103 sr1=0.356335 sr2=0.283103 n=4
-    //max1=0.844089 max2=0.451763 sr1=0.106697 sr2=0.064411 n=5
-    //max1=1.283065 max2=0.474908 sr1=0.376495 sr2=0.140924 n=6
-    //max1=1.415884 max2=0.358216 sr1=0.387935 sr2=0.099369 n=7
-    //max1=1.516391 max2=0.269375 sr1=0.396771 sr2=0.071402 n=8
-    //max1=1.594911 max2=0.204893 sr1=0.402889 sr2=0.052463 n=9
-    //max1=1.657861 max2=0.158189 sr1=0.408206 sr2=0.039484 n=10
-}
+//int main3() {
+//    return 0;
+//    N *= n;
+//
+//    double** a = createm<double>(N, N + 1);
+//
+//    mg(a, 2, 3);
+//
+//    //print(a,"g");
+//
+//    gm(a);
+//    double err_M = 0, err;
+//    for (size_t i = 0; i < N; i++)
+//    {
+//        short i1 = i % n, i2 = i / n - n * (i / n / n), i3 = i / n / n;
+//        err = fabs(u(A + (i1 + 0.5) * h1, C + (i2 + 0.5) * h2, E + (i3 + 0.5) * h3) - a[i][N]);
+//        if (err_M < err) err_M = err;
+//        printf("%f %f err=%f\n", u(A + (i1 + 0.5) * h1, C + (i2 + 0.5) * h2, E + (i3 + 0.5) * h3), a[i][N], err);
+//    }
+//    printf("\nMax err: %f", err_M);
+//    //max1=0.287156 max2=0.287156 sr1=0.085879 sr2=0.085879 n=2
+//    //max1=0.562298 max2=0.548107 sr1=0.099824 sr2=0.098840 n=3
+//    //max1=0.924069 max2=0.743103 sr1=0.356335 sr2=0.283103 n=4
+//    //max1=0.844089 max2=0.451763 sr1=0.106697 sr2=0.064411 n=5
+//    //max1=1.283065 max2=0.474908 sr1=0.376495 sr2=0.140924 n=6
+//    //max1=1.415884 max2=0.358216 sr1=0.387935 sr2=0.099369 n=7
+//    //max1=1.516391 max2=0.269375 sr1=0.396771 sr2=0.071402 n=8
+//    //max1=1.594911 max2=0.204893 sr1=0.402889 sr2=0.052463 n=9
+//    //max1=1.657861 max2=0.158189 sr1=0.408206 sr2=0.039484 n=10
+//}
