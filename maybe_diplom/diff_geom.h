@@ -83,7 +83,7 @@ double det_g_reverse(double** var1, double** var2) {
 	return var2[0][0] * var2[1][1] - var2[0][1] * var2[1][0];
 }
 
-void Jacobian(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, double** var) {
+inline void Jacobian(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, double** var) {
 	double* ksi_x1 = createv<double>(2), * ksi_x2 = createv<double>(2), * ksi_x3 = createv<double>(2);
 	(*function_x1)(t1, t2, ksi_x1, 1); (*function_x2)(t1, t2, ksi_x2, 1); (*function_x3)(t1, t2, ksi_x3, 1);
 	var[0][0] = ksi_x1[0]; var[0][1] = ksi_x1[1];
@@ -390,8 +390,10 @@ inline type_f f_vec(int N_i, double** tensor, double(*function_x1)(double, doubl
 			v = createm<double>(3, 1);
 			E0 = createv<type_f>(3);
 			base_func((*function_x1), (*function_x2), (*function_x3), l1, l2, i1, i2, 0, k, v);
-			func_cv((*function_x1)(l1, l2, NULL, 0), E0);
-			
+			func_cv((*function_x1)(l1, l2, NULL, 0), E0);	
+
+			cout << "v:\n";
+			print(v);
 
 			Sum += multv1<type_f>(v, E0) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
 			del(v); del(E0);
