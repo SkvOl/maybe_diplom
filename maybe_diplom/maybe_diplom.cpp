@@ -1,20 +1,9 @@
 ﻿#include "matrix.h"
 #include "integrals.h"
-#include <stdio.h> 
+#include "constants.h"
 
 
-int n = 20, N = n * n;
 
-
-//отрезок для n мерных интегральных уравнений
-double A = 0, B = 5;
-double C = 0, D = 5;
-double E = 0, F = 1;
-
-//шаг для n мерных интегральных уравнений
-double h1 = (B - A) / n;
-double h2 = (D - C) / n;
-double h3 = (F - E) / n;
 
 inline double u(double y1, double y2, double y3) {     
     //return y1 * y1;
@@ -57,7 +46,8 @@ void mk(double**& var, size_t type, size_t dim_s = 1) {
         }
 }
 
-void mg(complex<double>**& var, size_t type, size_t dim_s = 1) {
+template<typename type_mg>
+void mg(type_mg**& var, size_t type, size_t dim_s = 1) {
     //метод Галёркина
     //var - матрица, в которую будут записываться данные 
     //type - тип уравнения Фредгольма, первого или второго рода
@@ -89,9 +79,13 @@ void mg(complex<double>**& var, size_t type, size_t dim_s = 1) {
                 double e = A + j1 * h1, f = A + (j1 + 1.0) * h1;
                 double g = C + j2 * h2, l = C + (j2 + 1.0) * h2;
 
-                var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * (k0 * k0 - k1 * k1) * In_c(10, k_c, a, b, c, d, e, f, g, l);
+                var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * (k0 * k0 - k1 * k1) * In_c(3, k_c, a, b, c, d, e, f, g, l);
+                //var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * In<type_mg>(10, k, a, b, c, d, e, f, g, l);
+
             }
-            var[i][M] = In_c(100, fallWave_1, a, b, c, d);
+            var[i][M] = In_c(3, fallWave_1, a, b, c, d);
+            //var[i][M] = In<type_mg>(10, func, a, b, c, d);
+
         }
     }
     else if (dim_s == 3) {
@@ -144,7 +138,7 @@ void mg(complex<double>**& var, size_t type, size_t dim_s = 1) {
 int main() {
     //return 0;
     complex<double>** a = createm<complex<double>>(N, N + 1.0);// , ** a1 = createm<double>(N, N + 1.0);
-
+    //double** a = createm<double>(N, N + 1.0);// , ** a1 = createm<double>(N, N + 1.0);
     mg(a, 2.0, 2);
     
     //mk(a1, 2.0, 2);
@@ -166,13 +160,17 @@ int main() {
     space(1);
 
     printf("mg\n");
+    ofstream file1("ResForOleg.txt", ios_base::out);
+    file1 << "x1 " << "x2 " << "x3 " << "v\n";
     for (size_t i = 0; i < N; i++)
     {
+        short i1 = i / n, i2 = i % n;
         if (i % n == 0 && i != 0) printf("\n");
-        //printf("%f ", a[i][N]);
-        cout << a[i][N] << " ";
-        
+        cout << abs(a[i][N]) << " ";
+        file1 << A + h1 * (i1 + 0.5) << " " << C + h2 * (i2 + 0.5) << " " << 0 << " " << a[i][N].real() << "\n";
     }
+    file1.close();
+    cout << "\nk0: "<<k0 << "\n";
     //space(1);
 
     //printf("mk\n");

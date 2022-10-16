@@ -7,9 +7,9 @@
 #include <iostream>
 #include <malloc.h>
 #include <fstream>
+#include "constants.h"
 #include <complex>
 #include <string>
-#include <math.h>
 
 using namespace std;
 
@@ -374,6 +374,7 @@ type_eigenvalues* eigenvalues(type_eigenvalues** var) {
     return res;
 }
 
+
 template<typename type_cond>
 type_cond cond(type_cond** var) {
     size_t M = _msize(var) / sizeof(var[0]);
@@ -381,15 +382,16 @@ type_cond cond(type_cond** var) {
 
     type_cond* var1 = eigenvalues(var);
 
-    type_cond max = 0, min = 0;
+    type_cond max = abs(var1[0]), min = abs(var1[0]);
     for (size_t i = 0; i < M; i++)
     {
         if (abs(var1[i]) >= max) max = abs(var1[i]);
-        if (abs(var1[i]) <= max) min = abs(var1[i]);
+        if (abs(var1[i]) <= min) min = abs(var1[i]);
     }
 
     del(var1);
     return max / min;
 }
+
 
 #endif MATRIX_H

@@ -3,6 +3,7 @@
 #define DIFF_GEOM_H
 #include "matrix.h"
 #include "integrals.h"
+#include "constants.h"
 
 double x(double t1, double t2, double*& var, int k)
 {

@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="diff_geom.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="integrals.h" />
     <ClInclude Include="matrix.h" />
   </ItemGroup>
