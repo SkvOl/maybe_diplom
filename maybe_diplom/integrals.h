@@ -13,15 +13,15 @@ inline complex<double> k_c(double x1, ...) {
 
     va_start(args, x1);
     x2 = va_arg(args, double);
-    x3 = va_arg(args, double);
+    //x3 = va_arg(args, double);
 
     y1 = va_arg(args, double);
     y2 = va_arg(args, double);
-    y3 = va_arg(args, double);
+    //y3 = va_arg(args, double);
     va_end(args);
 
 
-    complex<double> i(0, 1), r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2) + pow(x3 - y3, 2));
+    complex<double> i(0, 1), r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2));
     r.real() < sqrt(h1 * h1 + h2 * h2) ? r += sqrt(h1 * h1 + h2 * h2) : r = r;
     return exp(i * k0 * r) / r;
 }
@@ -36,16 +36,12 @@ inline complex<double> func_c(double x1, ...) {
     return exp(i_k_x);
 }
 
-complex<double> fallWave_1(double k, double x, double y) {
-    complex <double> ed(0, 1.0);
-    return exp(ed * k * x);
-}
 
 inline complex<double> fallWave_1(double x1, ...) {
     va_list args;
     va_start(args, x1);
     va_end(args);
-    return exp(complex <double> (0, k1 * x1));
+    return exp(complex <double> (0, k0 * x1));
 }
 
 inline complex<double> In_c(int N_i, complex<double>(*function)(double, ...), double a, double b, double c, double d, double e, double f, double g, double h) {
@@ -66,8 +62,7 @@ inline complex<double> In_c(int N_i, complex<double>(*function)(double, ...), do
                         l3 = e + (k + 0.5) * h_k,
                         l4 = g + (z + 0.5) * h_z;
 
-                    if (l1 == l3 && l2 == l4) Sum += (*function)(l1, l2, l3 + 10.0 * mach_eps, l4 + 10.0 * mach_eps);
-                    else Sum += (*function)(l1, l2, l3, l4);
+                    Sum += (*function)(l1, l2, l3, l4);
                 }
             }
         }

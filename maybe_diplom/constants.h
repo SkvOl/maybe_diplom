@@ -9,8 +9,8 @@ int n = 20, N = n * n;
 
 const double mach_eps = sqrt(2.22045e-16);
 const double pi = acos(-1);
-//const double k0 = 2.0 * pi / (3 * pow(10, 10)) * (5 * pow(10, 10)), k1 = 1.5 * k0;
-const double k0 = 0.01, k1 = 1.5 * k0;
+const double k0 = 2.0 * pi / (3 * pow(10, 10)) * (5 * pow(10, 10)), k1 = 1.5 * k0;
+//const double k0 = 0.01, k1 = 1.5 * k0;
 //const double k0=1, k1 = 1.5 * k0;
 const double R = 1.0;
 const double lambda = 1.0;

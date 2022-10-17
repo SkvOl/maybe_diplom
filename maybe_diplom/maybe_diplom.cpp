@@ -81,7 +81,7 @@ void mg(type_mg**& var, size_t type, size_t dim_s = 1) {
 
                 var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * (k0 * k0 - k1 * k1) * In_c(3, k_c, a, b, c, d, e, f, g, l);
                 //var[i][j] = h1 * h2 * base_func(i, j) * (type - 1.0) - lambda * In<type_mg>(10, k, a, b, c, d, e, f, g, l);
-
+                //cout << var[i][j]<<"\n";
             }
             var[i][M] = In_c(3, fallWave_1, a, b, c, d);
             //var[i][M] = In<type_mg>(10, func, a, b, c, d);
@@ -167,7 +167,7 @@ int main() {
         short i1 = i / n, i2 = i % n;
         if (i % n == 0 && i != 0) printf("\n");
         cout << abs(a[i][N]) << " ";
-        file1 << A + h1 * (i1 + 0.5) << " " << C + h2 * (i2 + 0.5) << " " << 0 << " " << a[i][N].real() << "\n";
+        file1 << A + h1 * (i1 + 0.5) << " " << C + h2 * (i2 + 0.5) << " " << 0 << " " << abs(a[i][N]) << "\n";
     }
     file1.close();
     cout << "\nk0: "<<k0 << "\n";
