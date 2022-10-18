@@ -15,8 +15,11 @@ double x1_screen(double t1, double t2, double* var, int k)
 	case 1:
 	{
 		double* var1 = NULL;
-		var[0] = (x1_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - x1_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / (t1 + mach_eps) / mach_eps;
-		var[1] = (x1_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - x1_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / (t2 + mach_eps) / mach_eps;
+		//var[0] = (x1_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - x1_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / (t1 + mach_eps) / mach_eps;
+		//var[1] = (x1_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - x1_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / (t2 + mach_eps) / mach_eps;
+		var[0] = (x1_screen(t1 + mach_eps, t2, var1, 0) - x1_screen(t1 - mach_eps, t2, var1, 0)) / 2.0 / mach_eps;
+		var[1] = (x1_screen(t1, t2 + mach_eps, var1, 0) - x1_screen(t1, t2 - mach_eps, var1, 0)) / 2.0 / mach_eps;
+
 		return 0;
 	}
 	}
@@ -29,8 +32,10 @@ double x2_screen(double t1, double t2, double* var, int k)
 	case 1:
 	{
 		double* var1 = NULL;
-		var[0] = (x2_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - x2_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / (t1 + mach_eps) / mach_eps;
-		var[1] = (x2_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - x2_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / (t2 + mach_eps) / mach_eps;
+		/*var[0] = (x2_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - x2_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / (t1 + mach_eps) / mach_eps;
+		var[1] = (x2_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - x2_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / (t2 + mach_eps) / mach_eps;*/
+		var[0] = (x2_screen(t1 + mach_eps, t2, var1, 0) - x2_screen(t1 - mach_eps, t2, var1, 0)) / 2.0 / mach_eps;
+		var[1] = (x2_screen(t1, t2 + mach_eps, var1, 0) - x2_screen(t1, t2 - mach_eps, var1, 0)) / 2.0 / mach_eps;
 
 		return 0;
 	}
@@ -44,8 +49,11 @@ double x3_screen(double t1, double t2, double* var, int k)
 	case 1:
 	{
 		double* var1 = NULL;
-		var[0] = (x3_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - x3_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / (t1 + mach_eps) / mach_eps;
-		var[1] = (x3_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - x3_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / (t2 + mach_eps) / mach_eps;
+		/*var[0] = (x3_screen(t1 * (1.0 + mach_eps), t2, var1, 0) - x3_screen(t1 * (1.0 - mach_eps), t2, var1, 0)) / 2.0 / (t1 + mach_eps) / mach_eps;
+		var[1] = (x3_screen(t1, t2 * (1.0 + mach_eps), var1, 0) - x3_screen(t1, t2 * (1.0 - mach_eps), var1, 0)) / 2.0 / (t2 + mach_eps) / mach_eps;*/
+		var[0] = (x3_screen(t1 + mach_eps, t2, var1, 0) - x3_screen(t1 - mach_eps, t2, var1, 0)) / 2.0 / mach_eps;
+		var[1] = (x3_screen(t1, t2 + mach_eps, var1, 0) - x3_screen(t1, t2 - mach_eps, var1, 0)) / 2.0 / mach_eps;
+
 		return 0;
 	}
 	}
@@ -114,7 +122,7 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 			for (size_t j = 0; j < N_i; j++) {
 				double l1 = e + (i + 0.5) * h_i,
 					   l2 = g + (j + 0.5) * h_j;
-
+				
 				base_func((*function_x1), (*function_x2), (*function_x3), l1, l2, down_index1, down_index2, 0, up_index2, v);
 				type_A_v ker = (*function)((*function_x1)(t1, t2, NULL, 0), (*function_x2)(t1, t2, NULL, 0), (*function_x3)(t1, t2, NULL, 0), (*function_x1)(l1, l2, NULL, 0), (*function_x2)(l1, l2, NULL, 0), (*function_x3)(l1, l2, NULL, 0));
 				double sq_det = sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, var1));
@@ -130,7 +138,7 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 		break;
 	}
 	case 1: {
-		for (size_t i = 0; i < N_i; i++) {
+		/*for (size_t i = 0; i < N_i; i++) {
 			for (size_t j = 0; j < N_i; j++) {
 				double l1 = e + (i + 0.5) * h_i,
 					l2 = g + (j + 0.5) * h_j;
@@ -147,11 +155,21 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 		}
 		var2[0][0] *= h_i * h_j / 2.0 / (t1 + mach_eps) / mach_eps;
 		var2[1][0] *= h_i * h_j / 2.0 / (t1 + mach_eps) / mach_eps;
-		var2[2][0] *= h_i * h_j / 2.0 / (t1 + mach_eps) / mach_eps;
+		var2[2][0] *= h_i * h_j / 2.0 / (t1 + mach_eps) / mach_eps;*/
+
+		complex<double>** var21 = createm<type_A_v>(3, 1), **var22 = createm<type_A_v>(3, 1);
+		A_v(1, 0, (*function), (*function_x1), (*function_x2), (*function_x3), var1, var21, t1 + mach_eps, t2, down_index1, down_index2, up_index2);
+		A_v(1, 0, (*function), (*function_x1), (*function_x2), (*function_x3), var1, var22, t1 - mach_eps, t2, down_index1, down_index2, up_index2);
+
+		var2[0][0] = (var21[0][0] - var22[0][0]) / 2.0 / mach_eps;
+		var2[1][0] = (var21[1][0] - var22[1][0]) / 2.0 / mach_eps;
+		var2[2][0] = (var21[2][0] - var22[2][0]) / 2.0 / mach_eps;
+		
+		del(var21); del(var22);
 		break;
 	}
 	case 2: {
-		for (size_t i = 0; i < N_i; i++) {
+		/*for (size_t i = 0; i < N_i; i++) {
 			for (size_t j = 0; j < N_i; j++) {
 				double l1 = e + (i + 0.5) * h_i,
 					l2 = g + (j + 0.5) * h_j;
@@ -168,7 +186,17 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 		}
 		var2[0][0] *= h_i * h_j / 2.0 / (t2 + mach_eps) / mach_eps;
 		var2[1][0] *= h_i * h_j / 2.0 / (t2 + mach_eps) / mach_eps;
-		var2[2][0] *= h_i * h_j / 2.0 / (t2 + mach_eps) / mach_eps;
+		var2[2][0] *= h_i * h_j / 2.0 / (t2 + mach_eps) / mach_eps;*/
+
+		type_A_v** var21 = createm<type_A_v>(3, 1), ** var22 = createm<type_A_v>(3, 1);
+		A_v(1, 0, (*function), (*function_x1), (*function_x2), (*function_x3), var1, var21, t1, t2 + mach_eps, down_index1, down_index2, up_index2);
+		A_v(1, 0, (*function), (*function_x1), (*function_x2), (*function_x3), var1, var22, t1, t2 - mach_eps, down_index1, down_index2, up_index2);
+
+		var2[0][0] = (var21[0][0] - var22[0][0]) / 2.0 / mach_eps;
+		var2[1][0] = (var21[1][0] - var22[1][0]) / 2.0 / mach_eps;
+		var2[2][0] = (var21[2][0] - var22[2][0]) / 2.0 / mach_eps;
+
+		del(var21); del(var22);
 		break;
 	}
 	}
@@ -242,8 +270,7 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 	}
 	case 1: {
 		double** tensor2 = createm<double>(M, N), ** tensor_reverse2 = createm<double>(M, N);
-
-		det_g((*function_x1), (*function_x2), (*function_x3), t1 * (1.0 + mach_eps), t2, tensor);
+		/*det_g((*function_x1), (*function_x2), (*function_x3), t1 * (1.0 + mach_eps), t2, tensor);
 		det_g((*function_x1), (*function_x2), (*function_x3), t1 * (1.0 - mach_eps), t2, tensor2);
 		det_g_reverse(tensor, tensor_reverse);
 		det_g_reverse(tensor2, tensor_reverse2);
@@ -269,13 +296,19 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 			}
 		}
 		del(tensor2); del(tensor_reverse2);
-		Sum /= ((t1 + mach_eps) * mach_eps);
+		Sum /= ((t1 + mach_eps) * mach_eps);*/
+
+		double** tensor22 = createm<double>(M, N), ** tensor_reverse22 = createm<double>(M, N);
+		Sum = div<type_div>(0, tensor2, tensor_reverse2, (*function_x1), (*function_x2), (*function_x3), t1 + mach_eps, t2, down_index1, down_index2, up_index2);
+		Sum -= div<type_div>(0, tensor22, tensor_reverse22, (*function_x1), (*function_x2), (*function_x3), t1 - mach_eps, t2, down_index1, down_index2, up_index2);
+		Sum /= (2.0 * mach_eps);
+		del(tensor22); del(tensor_reverse22);
 		break;
 	}
 	case 2: {
 		double** tensor2 = createm<double>(M, N), ** tensor_reverse2 = createm<double>(M, N);
 
-		det_g((*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 + mach_eps), tensor);
+		/*det_g((*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 + mach_eps), tensor);
 		det_g((*function_x1), (*function_x2), (*function_x3), t1, t2 * (1.0 - mach_eps), tensor2);
 		det_g_reverse(tensor, tensor_reverse);
 		det_g_reverse(tensor2, tensor_reverse2);
@@ -302,7 +335,13 @@ inline type_div div(short k, double** tensor, double **tensor_reverse, double(*f
 			}
 		}
 		del(tensor2); del(tensor_reverse2);
-		Sum /= ((t2 + mach_eps) * mach_eps);
+		Sum /= ((t2 + mach_eps) * mach_eps);*/
+
+		double** tensor22 = createm<double>(M, N), ** tensor_reverse22 = createm<double>(M, N);
+		Sum = div<type_div>(0, tensor2, tensor_reverse2, (*function_x1), (*function_x2), (*function_x3), t1, t2 + mach_eps, down_index1, down_index2, up_index2);
+		Sum -= div<type_div>(0, tensor22, tensor_reverse22, (*function_x1), (*function_x2), (*function_x3), t1, t2 - mach_eps, down_index1, down_index2, up_index2);
+		Sum /= (2.0 * mach_eps);
+		del(tensor22); del(tensor_reverse22);
 		break;
 	}
 	}
@@ -391,9 +430,6 @@ inline type_f f_vec(int N_i, double** tensor, double(*function_x1)(double, doubl
 			E0 = createv<type_f>(3);
 			base_func((*function_x1), (*function_x2), (*function_x3), l1, l2, i1, i2, 0, k, v);
 			func_cv((*function_x1)(l1, l2, NULL, 0), E0);	
-
-			cout << "v:\n";
-			print(v);
 
 			Sum += multv1<type_f>(v, E0) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
 			del(v); del(E0);

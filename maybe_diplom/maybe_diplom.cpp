@@ -151,7 +151,7 @@ int main() {
     double t2 = MPI_Wtime() - t1;
     printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
     fflush(stdout);
-    if (_rank == 0) print(a, "g");
+    if (_rank == 0) print(a, "g", 5, 5);
 
     t1 = MPI_Wtime();
     gm(a, count_one_rank, _step, _rank, _size);
@@ -193,8 +193,8 @@ int main() {
             i1 = i / _n; i2 = i % _n;
             t1 = A + (i1 + 0.5) * h1;
             t2 = C + (i2 + 0.5) * h2;
-            if (i % _n == 0 && i != 0) printf("\n");
-            cout << res[i] << " ";
+            //if (i % _n == 0 && i != 0) printf("\n");
+            //cout << res[i] << " ";
             file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << abs(res[i]) << "\n";
         }
         file1.close();
@@ -374,7 +374,7 @@ int /*main*/Проверка_базисной_функции () {
     h1 = (B - A) / 4.0;
     h2 = (D - C) / 4.0;
 
-    cout << h1 << " " << h2 << "\n";
+    /*cout << h1 << " " << h2 << "\n";
     
     ofstream file1("v1.txt", ios_base::out);
     file1 << "x1 " << "x2 " << "x3 " << "v\n";
@@ -383,20 +383,48 @@ int /*main*/Проверка_базисной_функции () {
     file2 << "x1 " << "x2 " << "x3 " << "v\n";
 
     ofstream file3("v3.txt", ios_base::out);
-    file3 << "x1 " << "x2 " << "x3 " << "v\n";
-    for (double t1 = A; t1 < B; t1 += (B - A) / num_t) {
+    file3 << "x1 " << "x2 " << "x3 " << "v\n";*/
+    /*for (double t1 = A; t1 < B; t1 += (B - A) / num_t) {
         for (double t2 = C; t2 < D; t2 += (D - C) / num_t) {
             double** res = createm<double>(3, 1);
             base_func(x1_screen, x2_screen, x3_screen, t1, t2, 1, 1, 0, 1, res);
-            file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[0][0] << "\n";
-            file2 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[1][0] << "\n";
-            file3 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[2][0] << "\n";
+            ///file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[0][0] << "\n";
+            ///file2 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[1][0] << "\n";
+            ///file3 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[2][0] << "\n";
+            if (res[0][0] != 0 && res[1][0] != 0 && res[2][0] != 0) cout << t1 << " " << t2 << "\n";
             del(res);
         }
-    }
-    file1.close();
+    }*/
+
+
+    //-0.783054 2.00062
+    /*file1.close();
     file2.close();
-    file3.close();
+    file3.close();*/
+
+    /*double** res = createm<double>(3, 1), **var1 = createm<double>(2, 2);
+    base_func(x1_screen, x2_screen, x3_screen, -0.783054, 2.00062, 1, 1, 0,  2, res);
+    cout<<det_g(x1_screen, x2_screen, x3_screen, -0.783054, 100, var1)<<" :det\n";
+    print(res);
+    print(var1);*/
+
+    double t1 = -0.783054, t2 = 2.00062, l1 = -0.776802 , l2 = 2.86338;
+    
+    double** v = createm<double>(3, 1),**var1 = createm<double>(2, 2);
+    complex<double>** var2 = createm<complex<double>>(3, 1);
+    base_func(x1_screen, x2_screen, x3_screen, l1, l2, 1, 1, 0, 1, v);
+    complex<double> ker = k_c(x1_screen(t1, t2, NULL, 0), x2_screen(t1, t2, NULL, 0), x3_screen(t1, t2, NULL, 0), x1_screen(l1, l2, NULL, 0), x2_screen(l1, l2, NULL, 0), x3_screen(l1, l2, NULL, 0));
+    double sq_det = sqrt(det_g(x1_screen, x2_screen, x3_screen, l1, l2, var1));
+
+    cout << ker << "\n\n"<< sq_det<<"\n\n";
+
+    print(v);
+
+    var2[0][0] = ker * v[0][0] * sq_det;
+    var2[1][0] = ker * v[1][0] * sq_det;
+    var2[2][0] = ker * v[2][0] * sq_det;
+
+    print(var2);
 }
 
 int /*main*/Проверка_интеграла() {

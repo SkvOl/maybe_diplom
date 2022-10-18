@@ -21,11 +21,11 @@ inline complex<double> k_c(double x1, ...) {
     y3 = va_arg(args, double);
     va_end(args);
 
-    double custom_eps = sqrt(h1 * h1 + h2 * h2);
-
-    complex<double> i(0, 1), K = k0, r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2) + pow(x3 - y3, 2)), pi4 = 4.0 * pi;
+    double custom_eps = h1 <= h2 ? h1 : h2;
+    
+    complex<double> i(0, 1), r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2) + pow(x3 - y3, 2));
     r.real() < custom_eps ? r += custom_eps : r = r;
-    return exp(i * K * r) / pi4 / r;
+    return exp(i * k0 * r) / 4.0 / pi / r;
 }
 
 inline complex<double> func_c(double x1, ...) {
@@ -208,16 +208,6 @@ inline void base_func(double(*function_x1)(double, double, double*, int), double
     }
 
     mult(J, v_vec, var);
-
-    if (var[1][0] == 0 && var[2][0] == 0) {
-        cout << t1 << " " << t2 << "\n";
-        cout << "J:\n";
-        print(J);
-        cout << "v_vec:\n";
-        print(v_vec);
-        cout << "var:\n";
-        print(var);
-    }
 
     del(J);
     del(v_vec);

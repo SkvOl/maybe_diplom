@@ -3,7 +3,7 @@
 #define CONSTANTS_H
 #include <math.h>
 
-int _n = 2, _N = 2 * _n * _n - 2 * _n;
+int _n = 20, _N = 2 * _n * _n - 2 * _n;
 
 const double mach_eps = sqrt(2.22045e-16);
 const double pi = acos(-1);
