@@ -380,9 +380,11 @@ inline void grad(double** tensor, double** tensor_reverse, double(*function_x1)(
 
 template<typename type_S>
 inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int l, int i1, int i2, int j1, int j2) {
-	double a = A + i1 * h1, b = a + h1;
-	double c = C + i2 * h2, d = c + h2;
+	//double a = A + i1 * h1, b = a + h1;
+	//double c = C + i2 * h2, d = c + h2;
 
+	double a = A + i1 * h1, b = k == 1 && i1 < _n - 1 ? a + 2.0 * h1 : a + h1;
+	double c = C + i2 * h2, d = k == 2 && i2 < _n - 1 ? c + 2.0 * h2 : c + h2;
 
 	double h_i = (b - a) / N_i,
 		   h_j = (d - c) / N_i;
@@ -416,11 +418,8 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 
 template<typename type_f>
 inline type_f f_vec(int N_i, double** tensor, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int i1, int i2) {
-	//double a = A + i1 * h1, b = a + h1;
-	//double c = C + i2 * h2, d = c + h2;
-	
-	double a = A + i1 * h1, b = k == 1 && i1 < _n - 1 ? a + 2.0 * h1 : a + h1;
-	double c = C + i2 * h2, d = k == 2 && i2 < _n - 1 ? c + 2.0 * h2 : c + h2;
+	double a = A + i1 * h1, b = a + h1;
+	double c = C + i2 * h2, d = c + h2;
 
 	double h_i = (b - a) / N_i,
 		   h_j = (d - c) / N_i;
