@@ -72,9 +72,14 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
         int m = (int)(2 + sqrt(4 + 8 * N)) / 4;
         cout << "m: " << m << "\n";
         for (size_t i = 0; i < M; i++) {
-            i1 = (i + _step) / m, i2 = (i + _step) % m;
             _k = i + _step < (N - 1) / 2 ? 1 : 2;
+
+            if (_k == 2) { i1 = (i + _step) / m - m + 1; i2 = (i + _step) % m; }
+            else { i1 = (i + _step) % m; i2 = (i + _step) / m; }
             
+            
+
+            //cout << i1 << " " << i2 << "\n";
             if (_step == 0) {
                 printf("%d\n", i);
                 fflush(stdout);
@@ -82,8 +87,11 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
             tensor = createm<double>(2, 2);
             tensor_reverse = createm<double>(2, 2);
             for (size_t j = 0; j < N; j++) {  
-                j1 = j / m, j2 = j % m;
+                //cout << " " << i1 << " " << i2 << " " << j1 << " " << j2 << "\n";
                 _l = j + _step < (N - 1) / 2 ? 1 : 2;
+
+                if (_l == 2) { j1 = j / m - m + 1; j2 = j % m; }
+                else { j1 = j % m; j2 = j / m; }
                 
                 var[i][j] = lambda * S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, _k, _l, i1, i2, j1, j2);
                 
@@ -187,17 +195,23 @@ int main() {
     if (_rank == 0) {
         ofstream file1("res1.txt", ios_base::out);
         file1 << "x1 " << "x2 " << "x3 " << "v\n";
+        ofstream file2("res2.txt", ios_base::out);
+        file2 << "x1 " << "x2 " << "x3 " << "v\n";
+
+
         short i1, i2;
         double t1, t2;
-        for (size_t i = 0; i < _N; i++) {
+        for (size_t i = 0; i < _N / 2; i++) {
             i1 = i / _n; i2 = i % _n;
             t1 = A + (i1 + 0.5) * h1;
             t2 = C + (i2 + 0.5) * h2;
             //if (i % _n == 0 && i != 0) printf("\n");
             //cout << res[i] << " ";
             file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << abs(res[i]) << "\n";
+            file2 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << abs(res[i + _N / 2]) << "\n";
         }
         file1.close();
+        file2.close();
     }
 
 

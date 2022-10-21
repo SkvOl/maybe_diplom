@@ -21,7 +21,7 @@ inline complex<double> k_c(double x1, ...) {
     y3 = va_arg(args, double);
     va_end(args);
 
-    double custom_eps = h1 <= h2 ? h1 : h2;
+    double custom_eps = h1 <= h2 ? h1 : h2;//sqrt(h1 * h1 + h2 * h2);
     
     complex<double> i(0, 1), r = sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2) + pow(x3 - y3, 2));
     r.real() < custom_eps ? r += custom_eps : r = r;

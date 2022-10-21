@@ -107,8 +107,8 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 	var2[1][0] = 0.0;
 	var2[2][0] = 0.0;
 
-	double e = A + down_index1 * h1, f = e + h1;
-	double g = C + down_index2 * h2, l = g + h2;
+	double e = A + down_index1 * h1, f = up_index2 == 1 && down_index1 < _n - 1 ? e + 2.0 * h1 : e + h1;
+	double g = C + down_index2 * h2, l = up_index2 == 2 && down_index2 < _n - 1 ? g + 2.0 * h2 : g + h2;
 
 	double h_i = (f - e) / N_i,
 		   h_j = (l - g) / N_i;
@@ -377,8 +377,8 @@ inline void grad(double** tensor, double** tensor_reverse, double(*function_x1)(
 
 template<typename type_S>
 inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int l, int i1, int i2, int j1, int j2) {
-	double a = A + i1 * h1, b = a + h1;
-	double c = C + i2 * h2, d = c + h2;
+	double a = A + i1 * h1, b = k == 1 && i1 < _n - 1 ? a + 2.0 * h1 : a + h1;
+	double c = C + i2 * h2, d = k == 2 && i2 < _n - 1 ? c + 2.0 * h2 : c + h2;
 
 
 	double h_i = (b - a) / N_i,
