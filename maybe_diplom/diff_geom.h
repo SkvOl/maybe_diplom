@@ -11,7 +11,8 @@ inline complex<double> k_c(double x1, ...);
 double x1_screen(double t1, double t2, double* var, int k)
 {
 	switch (k) {
-	case 0:return R * cos(t1) * cos(t2);
+	case 0: return R * cos(t1) * cos(t2);
+	//case 0: return R * sin(t1) * cos(t2);
 	case 1:
 	{
 		double* var1 = NULL;
@@ -29,6 +30,7 @@ double x2_screen(double t1, double t2, double* var, int k)
 {
 	switch (k) {
 	case 0:return R * cos(t1) * sin(t2);
+	//case 0: return R * sin(t1) * sin(t2);
 	case 1:
 	{
 		double* var1 = NULL;
@@ -46,6 +48,7 @@ double x3_screen(double t1, double t2, double* var, int k)
 {
 	switch (k) {
 	case 0:return R * sin(t1);
+	//case 0:return R * cos(t1);
 	case 1:
 	{
 		double* var1 = NULL;
@@ -107,8 +110,8 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 	var2[1][0] = 0.0;
 	var2[2][0] = 0.0;
 
-	double e = A + down_index1 * h1, f = up_index2 == 1 && down_index1 < _n - 1 ? e + 2.0 * h1 : e + h1;
-	double g = C + down_index2 * h2, l = up_index2 == 2 && down_index2 < _n - 1 ? g + 2.0 * h2 : g + h2;
+	double e = A + down_index1 * h1, f = up_index2 == 1 ? e + 2.0 * h1 : e + h1;
+	double g = C + down_index2 * h2, l = up_index2 == 2 ? g + 2.0 * h2 : g + h2;
 
 	double h_i = (f - e) / N_i,
 		   h_j = (l - g) / N_i;
@@ -377,8 +380,8 @@ inline void grad(double** tensor, double** tensor_reverse, double(*function_x1)(
 
 template<typename type_S>
 inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int l, int i1, int i2, int j1, int j2) {
-	double a = A + i1 * h1, b = k == 1 && i1 < _n - 1 ? a + 2.0 * h1 : a + h1;
-	double c = C + i2 * h2, d = k == 2 && i2 < _n - 1 ? c + 2.0 * h2 : c + h2;
+	double a = A + i1 * h1, b = k == 1 ? a + 2.0 * h1 : a + h1;
+	double c = C + i2 * h2, d = k == 2 ? c + 2.0 * h2 : c + h2;
 
 
 	double h_i = (b - a) / N_i,
@@ -413,8 +416,8 @@ inline type_S S(int N_i, double** tensor, double** tensor_reverse, double(*funct
 
 template<typename type_f>
 inline type_f f_vec(int N_i, double** tensor, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int i1, int i2) {
-	double a = A + i1 * h1, b = a + h1;
-	double c = C + i2 * h2, d = c + h2;
+	double a = A + i1 * h1, b = k == 1 ? a + 2.0 * h1 : a + h1;
+	double c = C + i2 * h2, d = k == 2 ? c + 2.0 * h2 : c + h2;
 
 	double h_i = (b - a) / N_i,
 		   h_j = (d - c) / N_i;
@@ -432,6 +435,15 @@ inline type_f f_vec(int N_i, double** tensor, double(*function_x1)(double, doubl
 			func_cv((*function_x1)(l1, l2, NULL, 0), E0);	
 
 			Sum += multv1<type_f>(v, E0) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
+			
+			if (abs(Sum) == 0) {
+				cout << l1 << " " << l2 << " " << i1 << " " << i2 << " " << k << "\n\nE0:\n";
+				print(E0);
+				cout << "v:\n";
+				print(v);
+			}
+			
+			
 			del(v); del(E0);
 		}
 	}

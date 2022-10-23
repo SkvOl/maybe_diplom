@@ -135,6 +135,33 @@ inline void print(type_vector_print* var) {
 	fflush(stdout);
 }
 
+template<typename type_abs>
+inline double** absm(type_abs** var){
+	size_t M, N;
+	M = _msize(var) / sizeof(var[0]);
+	N = _msize(var[0]) / sizeof(var[0][0]);
+	double** res = createm<double>(M, N);
+
+	for (size_t i = 0; i < M; i++) 
+		for (size_t j = 0; j < N; j++) 
+			res[i][j] = abs(var[i][j]);
+		
+	return res;
+}
+
+template<typename type_col>
+inline type_col* col(type_col ** var, int num) {
+	size_t M;
+	M = _msize(var) / sizeof(var[0]);
+	type_col* res = createv<type_col>(M);
+
+	for (size_t i = 0; i < M; i++) {
+		res[i] = var[i][num];
+	}
+
+	return res;
+}
+
 void space(size_t k = 0) {
 	//вывод пробелов в консоль
 	for (size_t ind_k = 0; ind_k < k; ind_k++)
