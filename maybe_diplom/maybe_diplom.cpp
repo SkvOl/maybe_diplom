@@ -69,10 +69,10 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
     }
     else if (dim_s == 2) {
         //int m = (int)sqrt(N - 1);
-        int m = (int)(2 + sqrt(4 + 8 * N)) / 4;
-        //cout << "m: " << m << "\n";
+        int m = (int)(2 + sqrt(4 + 8 * (N - 1))) / 4;
+        cout << "m: " << m << "\n";
         for (size_t i = 0; i < M; i++) {
-            _k = ((i + _step) < (N) / 2 ? 1 : 2);  
+            _k = ((i + _step) < (N - 1) / 2 ? 1 : 2);  
             
             if(_k == 1) { i1 = (i + _step) / m; i2 = (i + _step) % m; }
             else { i1 = (i + _step) / (m - 1) - m; i2 = (i + _step) % (m - 1); }
@@ -86,13 +86,20 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0) {
                 printf("%d\n", i);
                 fflush(stdout);
             }
+
             tensor = createm<double>(2, 2);
             tensor_reverse = createm<double>(2, 2);
-            for (size_t j = 0; j < N; j++) {    
-                _l = (j < (N) / 2 ? 1 : 2);
+            for (size_t j = 0; j < N - 1; j++) {    
+                _l = (j < (N - 1) / 2 ? 1 : 2);
 
                 if (_l == 1) { j1 = j / m; j2 = j % m; }
-                else { j1 = j / (m - 1) - m; j2 = j % (m - 1); }
+                else { 
+                    j1 = j / (m - 1) - m; 
+                    j2 = j % (m - 1); 
+                    //cout << j1 << " " << j2 << "\n";
+
+                }
+                /*if(j1>3)cout << "\nj1=" << j1 << " j2=" << j2 << " l=" << _l << "\n";*/
                 
                 var[i][j] = lambda * S<complex<double>>(1, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, _k, _l, i1, i2, j1, j2);
                 
@@ -196,20 +203,14 @@ int main() {
 
     if (_rank == 0) {
         ofstream file1("res1.txt", ios_base::out);
-        file1 << "x1 " << "x2 " << "x3 " << "v\n";
+        file1 << "x1 x2 x3 v_real v_imag v_abs\n";
         ofstream file2("res2.txt", ios_base::out);
-        file2 << "x1 " << "x2 " << "x3 " << "v\n";
-
+        file2 << "x1 x2 x3 v_real v_imag v_abs\n";
+       
+        
         short i1, i2;
-        double t1, t2;
+        double t1, t2, x1, x2, x3;
         for (size_t i = 0; i < _N; i++) {
-            if (i < _N / 2) { i1 = i / _n; i2 = i % _n; }
-            else { i1 = i / (_n - 1) - _n; i2 = i % (_n - 1); }   
-
-            t1 = A + (i1 + 0.5) * h1;
-            t2 = C + (i2 + 0.5) * h2;
-
-            
             /*if (i != 0 && i % _n == 0) {
                 cout << "\n";
                 fflush(stdout);
@@ -219,8 +220,23 @@ int main() {
                 fflush(stdout);
             }*/
 
-            if (i < _N / 2) file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << abs(res[i]) << "\n";
-            else file2 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << abs(res[i]) << "\n";
+            if (i < _N / 2) {
+                i1 = i / _n; i2 = i % _n;
+
+                t1 = A + (i1 + 0.5) * h1;
+                t2 = C + (i2 + 0.5) * h2;
+
+
+                file1 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[i].real() << " " << res[i].imag() << " " << abs(res[i]) << "\n";
+            }
+            else {
+                i1 = i / (_n - 1) - _n; i2 = i % (_n - 1);
+
+                t1 = A + (i1 + 0.5) * h1;
+                t2 = C + (i2 + 0.5) * h2;
+
+                file2 << x1_screen(t1, t2, NULL, 0) << " " << x2_screen(t1, t2, NULL, 0) << " " << x3_screen(t1, t2, NULL, 0) << " " << res[i].real() << " " << res[i].imag() << " " << abs(res[i]) << "\n";
+            }
         }
         file1.close();
         file2.close();

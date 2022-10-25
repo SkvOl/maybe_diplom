@@ -3,7 +3,7 @@
 #define CONSTANTS_H
 #include <math.h>
 
-int _n = 4, _N = 2 * _n * _n - 2 * _n;
+int _n = 20, _N = 2 * _n * _n - 2 * _n;
 
 const double mach_eps = sqrt(2.22045e-16);
 const double pi = acos(-1);
@@ -16,8 +16,8 @@ const double lambda = 1.0;
 double A = -pi / 2.0, B = pi / 2.0;
 double C = 0.0, D = 2.0 * pi;
 
-//double A = 0.0, B = 2.0 * pi;
-//double C = 0.0, D = pi;
+//double A = 0.0, B = pi;
+//double C = 0.0, D = 2.0 * pi;
 double E = 0, F = 1;
 
 //шаг  для n мерных интегральных уравнений

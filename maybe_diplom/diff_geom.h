@@ -112,7 +112,9 @@ inline void A_v(int N_i, int k, type_A_v(*function)(double, ...), double(*functi
 
 	double e = A + down_index1 * h1, f = up_index2 == 1 ? e + 2.0 * h1 : e + h1;
 	double g = C + down_index2 * h2, l = up_index2 == 2 ? g + 2.0 * h2 : g + h2;
-
+	//cout << "a=" << e << " b=" << f << " c=" << g << " d=" << l << " down_index1=" << down_index1 << " down_index2=" << down_index2 << " k=" << up_index2 << "\n";
+	
+	//if(down_index1>3)cout << down_index1 << " " << down_index2 << " " << up_index2 << "\n";
 	double h_i = (f - e) / N_i,
 		   h_j = (l - g) / N_i;
 
@@ -418,7 +420,7 @@ template<typename type_f>
 inline type_f f_vec(int N_i, double** tensor, double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), int k, int i1, int i2) {
 	double a = A + i1 * h1, b = k == 1 ? a + 2.0 * h1 : a + h1;
 	double c = C + i2 * h2, d = k == 2 ? c + 2.0 * h2 : c + h2;
-
+	/*cout << "a=" << a << " b=" << b << " c=" << c << " d=" << d << " i1=" << i1 << " i2=" << i2 << " k=" << k << "\n";*/
 	double h_i = (b - a) / N_i,
 		   h_j = (d - c) / N_i;
 
@@ -435,14 +437,6 @@ inline type_f f_vec(int N_i, double** tensor, double(*function_x1)(double, doubl
 			func_cv((*function_x1)(l1, l2, NULL, 0), E0);	
 
 			Sum += multv1<type_f>(v, E0) * sqrt(det_g((*function_x1), (*function_x2), (*function_x3), l1, l2, tensor));
-			
-			if (abs(Sum) == 0) {
-				cout << l1 << " " << l2 << " " << i1 << " " << i2 << " " << k << "\n\nE0:\n";
-				print(E0);
-				cout << "v:\n";
-				print(v);
-			}
-			
 			
 			del(v); del(E0);
 		}
