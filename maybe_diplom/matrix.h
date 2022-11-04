@@ -135,6 +135,54 @@ inline void print(type_vector_print* var) {
 	fflush(stdout);
 }
 
+template<typename type_vector_print>
+inline void print(type_vector_print* var1, double **var2) {
+	//вывод указателя var в консоль
+	size_t M = _msize(var1) / sizeof(var1[0]);
+
+	const char* type = "";
+	if (sizeof(type_vector_print) == sizeof(int))  type = "%d  %f\n";
+	if (sizeof(type_vector_print) == sizeof(double))  type = "%f  %f\n";
+	if (sizeof(type_vector_print) == sizeof(complex<double>))  type = "complex";
+
+	for (size_t i = 0; i < M; i++)
+	{
+		if (type != "complex") printf(type, var1[i], var2[i][0]);
+		else cout << var1[i] << "  " << var2[i][0] << "\n";
+
+		fflush(stdout);
+	}
+	printf("\n");
+	fflush(stdout);
+}
+
+template<typename type_abs>
+inline double** absm(type_abs** var){
+	size_t M, N;
+	M = _msize(var) / sizeof(var[0]);
+	N = _msize(var[0]) / sizeof(var[0][0]);
+	double** res = createm<double>(M, N);
+
+	for (size_t i = 0; i < M; i++) 
+		for (size_t j = 0; j < N; j++) 
+			res[i][j] = abs(var[i][j]);
+		
+	return res;
+}
+
+template<typename type_col>
+inline type_col* col(type_col ** var, int num) {
+	size_t M;
+	M = _msize(var) / sizeof(var[0]);
+	type_col* res = createv<type_col>(M);
+
+	for (size_t i = 0; i < M; i++) {
+		res[i] = var[i][num];
+	}
+
+	return res;
+}
+
 void space(size_t k = 0) {
 	//вывод пробелов в консоль
 	for (size_t ind_k = 0; ind_k < k; ind_k++)
@@ -452,6 +500,31 @@ inline type_multv2 multv2(type_multv2** var1, double* var2) {
 	type_multv2 Sum = 0;
 	for (size_t i = 0; i < M; i++) Sum += var1[i][0] * var2[i];
 	return Sum;
+}
+
+template<typename type_multv3>
+inline type_multv3 multv3(type_multv3* var1, double* var2) {
+	size_t M = _msize(var2) / sizeof(var2[0]);
+
+	type_multv3 Sum = 0;
+	for (size_t i = 0; i < M; i++) Sum += var1[i] * var2[i];
+	return Sum;
+}
+
+template<typename type_mult>
+inline void mult(type_mult** var1, type_mult* var2, type_mult* res) {
+	size_t M = _msize(var1) / sizeof(var1[0]);
+	size_t N = _msize(var1[0]) / sizeof(var1[0][0]);
+
+	for (size_t i = 0; i < M; i++)
+	{
+		type_mult sum = 0;
+		for (size_t j = 0; j < N; j++)
+		{
+			sum += var1[i][j] * var2[j];
+		}
+		res[i] = sum;
+	}
 }
 //
 template<typename type_diag>
