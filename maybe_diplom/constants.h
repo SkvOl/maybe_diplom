@@ -2,13 +2,14 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 #include <math.h>
+#include <stdarg.h>
+#include <stdio.h>
 
-const int _n = 2, _N = 4 * _n * _n - 4 * _n;
+const int _n = 4, _N = 4 * _n * _n - 4 * _n;
 
 const double mach_eps = sqrt(2.22045e-16);//1e-5;
 const double pi = acos(-1);
 const complex<double> k0(1, 0.01), k1 = 1.5 * k0;
-//double k0 = 2 * pi;
 const double R = 1.0;
 const double lambda = 1.0;
 

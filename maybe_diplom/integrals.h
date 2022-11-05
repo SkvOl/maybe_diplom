@@ -1,7 +1,6 @@
 #pragma once
 #ifndef INTEGRALS_H
 #define INTEGRALS_H
-#include <stdarg.h>
 #include "constants.h"
 #include "diff_geom.h"
 
@@ -45,18 +44,40 @@ inline complex<double> func_c(double x1, ...) {
     return exp(i_k_x*k0);
 }
 
-inline void func_cv(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, complex<double>* var) {
+inline void func_cv(double(*func_x1)(int, ...), double(*func_x2)(int, ...), double(*func_x3)(int, ...), ...) {
+    double t1, t2, t3;
+    complex<double>* var;
+
+    va_list args;
+    va_start(args, func_x3);
+    t1 = va_arg(args, double);
+    t2 = va_arg(args, double);
+    t3 = va_arg(args, double);
+    var = va_arg(args, complex<double>*);
+    va_end(args);
+    
     var[0] = 0;
-    var[1] = exp(complex<double>(0, (*function_x1)(t1, t2, NULL, 0)) * k0);
+    var[1] = exp(complex<double>(0, (*func_x1)(0, t1, t2, t3, NULL)) * k0);
     var[2] = 0;
 }
 
-inline void func_cv_tang(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, complex<double>* var) {
+inline void func_cv_tang(double(*func_x1)(int, ...), double(*func_x2)(int, ...), double(*func_x3)(int, ...), ...) {
+    double t1, t2, t3;
+    complex<double>* var;
+
+    va_list args;
+    va_start(args, func_x3);
+    t1 = va_arg(args, double);
+    t2 = va_arg(args, double);
+    t3 = va_arg(args, double);
+    var = va_arg(args, complex<double>*);
+    va_end(args);
+
 
     double* normal = createv<double>(3);
-    vector_n((*function_x1), (*function_x2), (*function_x3), t1, t2, normal);
-    double x1 = (*function_x1)(t1, t2, NULL, 0), x2 = (*function_x2)(t1, t2, NULL, 0), x3 = (*function_x3)(t1, t2, NULL, 0);
-    
+    vector_n((*func_x1), (*func_x2), (*func_x3), t1, t2, t3, normal);
+    double x1 = (*func_x1)(0, t1, t2, t3, NULL), x2 = (*func_x2)(0, t1, t2, t3, NULL), x3 = (*func_x3)(0, t1, t2, t3, NULL);
+
     var[0] = 0;
     var[1] = exp(complex<double>(0, x1) * k0);
     var[2] = 0;
@@ -70,8 +91,19 @@ inline void func_cv_tang(double(*function_x1)(double, double, double*, int), dou
     del(normal);
 }
 
-inline void permittivity_obj(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, complex<double>* var) {
-    if ((*function_x2)(t1, t2, NULL, 0) >= 0) {
+inline void permittivity_obj(double(*func_x1)(int, ...), double(*func_x2)(int, ...), double(*func_x3)(int, ...), ...) {
+    double t1, t2, t3;
+    complex<double>* var;
+
+    va_list args;
+    va_start(args, func_x3);
+    t1 = va_arg(args, double);
+    t2 = va_arg(args, double);
+    t3 = va_arg(args, double);
+    var = va_arg(args, complex<double>*);
+    va_end(args);
+
+    if ((*func_x2)(0, t1, t2, t3, NULL) >= 0) {
         var[0] = 0.2;
         var[1] = 0.2;
         var[2] = 0.2;
@@ -173,51 +205,70 @@ inline double base_func(int i, int j) {
     return i == j ? 1.0 : 0.0;
 }
 
-inline void base_func(double* var,...) {
-    //size_t M = _msize(var) / sizeof(var[0]);
-    double it1, it2, it3, jt1, jt2, jt3;   
-    
+//inline void base_func(double* var,...) {
+//    //size_t M = _msize(var) / sizeof(var[0]);
+//    double it1, it2, it3, jt1, jt2, jt3;   
+//    
+//    va_list args;
+//    va_start(args, var);
+//    it1 = va_arg(args, double);
+//    it2 = va_arg(args, double);
+//    it3 = va_arg(args, double);
+//
+//    jt1 = va_arg(args, double);
+//    jt2 = va_arg(args, double);
+//    jt3 = va_arg(args, double);
+//    va_end(args);
+//
+//    if (var[0] == 1) {
+//        var[1] = 0.0;
+//        var[2] = 0.0;
+//        if ((jt1 >= it1 - h1_obj && jt1 <= it1) && (it2 == jt2)) {
+//            var[0] = 1.0 + (jt1 - it1) / h1_obj;
+//        }
+//        else if ((jt1 <= it1 + h1_obj && jt1 >= it1) && it2 == jt2) {
+//            var[0] = 1.0 - (jt1 - it1) / h1_obj;
+//        }
+//        else var[0] = 0.0;
+//    }
+//    else if (var[1] == 1) {
+//        var[0] = 0.0;
+//        var[2] = 0.0;
+//        if ((it1 == jt1) && (jt2 >= it2 - h2_obj && jt2 <= it2)) {
+//            var[1] = 1.0 + (jt2 - it2) / h2_obj;
+//        }
+//        else if ((it1 == jt1) && (jt2 <= it2 + h2_obj && jt2 >= it2)) {
+//            var[1] = 1.0 - (jt2 - it2) / h2_obj;
+//        }
+//        else var[1] = 0.0;
+//    }
+//}
+
+inline void base_func_rft(double(*func_x1)(int, ...), double(*func_x2)(int, ...), double(*func_x3)(int, ...), ...) {
+    short down_index1, down_index2, up_index1, up_index2;
+    double* var, t1, t2, t3;
+    bool object;
+
     va_list args;
-    va_start(args, var);
-    it1 = va_arg(args, double);
-    it2 = va_arg(args, double);
-    it3 = va_arg(args, double);
-
-    jt1 = va_arg(args, double);
-    jt2 = va_arg(args, double);
-    jt3 = va_arg(args, double);
+    va_start(args, func_x3);
+    t1 = va_arg(args, double);
+    t2 = va_arg(args, double);
+    t3 = va_arg(args, double);
+    down_index1 = va_arg(args, short);
+    down_index2 = va_arg(args, short);
+    up_index1 = va_arg(args, short);
+    up_index2 = va_arg(args, short);
+    object = va_arg(args, bool);
+    var = va_arg(args, double*);
     va_end(args);
-
-    if (var[0] == 1) {
-        var[1] = 0.0;
-        var[2] = 0.0;
-        if ((jt1 >= it1 - h1_obj && jt1 <= it1) && (it2 == jt2)) {
-            var[0] = 1.0 + (jt1 - it1) / h1_obj;
-        }
-        else if ((jt1 <= it1 + h1_obj && jt1 >= it1) && it2 == jt2) {
-            var[0] = 1.0 - (jt1 - it1) / h1_obj;
-        }
-        else var[0] = 0.0;
-    }
-    else if (var[1] == 1) {
-        var[0] = 0.0;
-        var[2] = 0.0;
-        if ((it1 == jt1) && (jt2 >= it2 - h2_obj && jt2 <= it2)) {
-            var[1] = 1.0 + (jt2 - it2) / h2_obj;
-        }
-        else if ((it1 == jt1) && (jt2 <= it2 + h2_obj && jt2 >= it2)) {
-            var[1] = 1.0 - (jt2 - it2) / h2_obj;
-        }
-        else var[1] = 0.0;
-    }
-}
-
-inline void base_func(double(*function_x1)(double, double, double*, int), double(*function_x2)(double, double, double*, int), double(*function_x3)(double, double, double*, int), double t1, double t2, int down_index1, int down_index2, int up_index1, int up_index2, double* var, bool object) {
+   
+    
     double** J = createm<double>(3, 2), * v_vec = createv<double>(2);
     double A_base_func = object ? A_obj : A_screen, C_base_func = object ? C_obj : C_screen, h1_base_func = object ? h1_obj : h1_screen, h2_base_func = object ? h2_obj : h2_screen;
     
-    Jacobian((*function_x1), (*function_x2), (*function_x3), t1, t2, J);
-    
+
+    Jacobi((*func_x1), (*func_x2), (*func_x3), t1, t2, 0, J);
+
     double d1, d2, d3, d4;
     if (up_index2 == 1) {
         d1 = A_base_func + h1_base_func * down_index1, d2 = d1 + 2.0 * h1_base_func, d3 = C_base_func + h2_base_func * down_index2, d4 = d3 + h2_base_func;
@@ -229,12 +280,58 @@ inline void base_func(double(*function_x1)(double, double, double*, int), double
         v_vec[0] = 0.0;
         v_vec[1] = d1 <= t1 && t1 <= d2 && d3 <= t2 && t2 <= d4 ? 1.0 - fabs(t2 - C_base_func - h2_base_func * (down_index2 + 1.0)) / h2_base_func / 1.0 : 0.0;
     }
-   
+
+
     mult(J, v_vec, var);
 
     del(J);
     del(v_vec);
 }
+
+inline void base_func(double(*func_x1)(int, ...), double(*func_x2)(int, ...), double(*func_x3)(int, ...), ...) {
+    short down_index1, down_index2, down_index3;
+    double* var, t1, t2, t3;
+    bool object;
+
+    va_list args;
+    va_start(args, func_x3);
+    t1 = va_arg(args, double);
+    t2 = va_arg(args, double);
+    t3 = va_arg(args, double);
+    down_index1 = va_arg(args, short);
+    down_index2 = va_arg(args, short);
+    down_index3 = va_arg(args, short); 
+    object = va_arg(args, bool);
+    var = va_arg(args, double*);
+    va_end(args);
+    
+    double** J = createm<double>(3, 2), * v_vec = createv<double>(2);
+    double A_base_func = object ? A_obj : A_screen, 
+           C_base_func = object ? C_obj : C_screen,
+           E_base_func = object ? E_obj : E_screen,
+           h1_base_func = object ? h1_obj : h1_screen, 
+           h2_base_func = object ? h2_obj : h2_screen,
+           h3_base_func = object ? h3_obj : h3_screen;
+
+    Jacobi((*func_x1), (*func_x2), (*func_x3), t1, t2, t3, J);
+
+    double d1, d2, d3, d4, d5, d6;
+    
+    d1 = A_base_func + h1_base_func * down_index1; d2 = d1 + 2.0 * h1_base_func; 
+    d3 = C_base_func + h2_base_func * down_index2; d4 = d3 + h2_base_func;
+    d5 = C_base_func + h2_base_func * down_index2; d6 = d3 + h2_base_func;
+
+    v_vec[0] = 1.0;
+    v_vec[1] = 1.0;
+    v_vec[3] = 1.0;
+   
+
+    mult(J, v_vec, var);
+
+    del(J);
+    del(v_vec);
+}
+
 
 inline void grad(double(*function)(double, ...), double* res, double x1, double x2) {
     res[0] = ((*function)(x1 * (1 + mach_eps), x2) - (*function)(x1 * (1 - mach_eps), x2)) / 2.0 / x1 / mach_eps;

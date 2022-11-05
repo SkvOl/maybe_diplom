@@ -95,7 +95,7 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0, int
                 //complex<double> i_ksi = f_vec<complex<double>>(2, permittivity_obj, tensor, x1_obj, x2_obj, x3_obj, _k, i1, i2, 1);
 
                 if ((i + _step) < (N - 1) / 2) {
-                    //var[i][j + (N - 1) / 2] = -lambda * S_obj_screen<complex<double>>(4, tensor, tensor_reverse, x1_obj, x2_obj, x3_obj, _k, _l, i1, i2, j1, j2);
+                    var[i][j + (N - 1) / 2] = 1;//-lambda * S_obj_screen<complex<double>>(4, tensor, tensor_reverse, x1_obj, x2_obj, x3_obj, _k, _l, i1, i2, j1, j2);
                     int rank = 0, step = 0;
                     for (rank; rank < _size; rank++) {
                         step += count_one_rank[rank];
@@ -105,19 +105,19 @@ void mg(complex<double>** var, size_t type, size_t dim_s = 1, int _step = 0, int
                     fflush(stdout);
                     MPI_Isend(&var[i][j + (N - 1) / 2], 1, MPI_DOUBLE_COMPLEX, rank, 3, MPI_COMM_WORLD, &request);
                     
-                    var[i][j] =/*интеграл от диэлектрической проницаемости*/lambda * S_obj<complex<double>>(4, tensor, tensor_reverse, x1_obj, x2_obj, x3_obj, _k, _l, i1, i2, j1, j2);
+                    var[i][j] = lambda * S_obj<complex<double>>(x1_obj, x2_obj, x3_obj, 4, _k, _l, i1, i2, j1, j2, tensor, tensor_reverse);
                 
                 }
                 else {
-                    //var[i][j + (N - 1) / 2] = -lambda * S_screen<complex<double>>(4, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, _k, _l, i1, i2, j1, j2);
+                    var[i][j + (N - 1) / 2] = 1; //-lambda * S_screen<complex<double>>(4, tensor, tensor_reverse, x1_screen, x2_screen, x3_screen, _k, _l, i1, i2, j1, j2);
                     
 
                     MPI_Irecv(&var[i][j], 1, MPI_DOUBLE_COMPLEX, MPI_ANY_SOURCE, 3, MPI_COMM_WORLD, &request);
                     MPI_Wait(&request, &status);
                 }
             }
-            //if ((i + _step) < (N - 1) / 2) var[i][N - 1] = -f_vec<complex<double>>(2, func_cv, tensor, x1_obj, x2_obj, x3_obj, _k, i1, i2, 1);
-            //else var[i][N - 1] = -f_vec<complex<double>>(2, func_cv_tang, tensor, x1_screen, x2_screen, x3_screen, _k, i1, i2, 0);
+            if ((i + _step) < (N - 1) / 2) var[i][N - 1] = 1; //-f_vec<complex<double>>(2, func_cv, tensor, x1_obj, x2_obj, x3_obj, _k, i1, i2, 1);
+            else var[i][N - 1] = 1;//-f_vec<complex<double>>(2, func_cv_tang, tensor, x1_screen, x2_screen, x3_screen, _k, i1, i2, 0);
 
             del(tensor); del(tensor_reverse);
         }
@@ -183,7 +183,7 @@ int main() {
     printf("rank: %d  time fill matrix is: %f\n", _rank, t2);
     fflush(stdout);
     //if (_rank == 0) print(absm(a), "g");
-    if (_rank == 0) print(absm(a), "g", 4, 4);
+    if (_rank == 0) print(absm(a), "g", 8, 8);
     //print(col(a, _N));
 
     t1 = MPI_Wtime();
@@ -230,21 +230,21 @@ int main() {
         short i1, i2;
         double x1, x2, x3;
         double* v;
-        complex<double>* sum; 
+        complex<double>* sum; int count1 = 0, count2 = 0;;
         for (double t1 = A_screen; t1 < B_screen; t1 += (B_screen - A_screen) / 100.0) {
             for (double t2 = C_screen; t2 < D_screen; t2 += (D_screen - C_screen) / 100.0) {
-                x1 = x1_screen(t1, t2, NULL, 0); x2 = x2_screen(t1, t2, NULL, 0); x3 = x3_screen(t1, t2, NULL, 0);
+                x1 = x1_screen(0, t1, t2, 0, NULL); x2 = x2_screen(0, t1, t2, 0, NULL, 0); x3 = x3_screen(0, t1, t2, 0, NULL);
                 sum = createv<complex<double>>(3, true);
                 for (size_t i = _N / 2; i < _N; i++) {
                     v = createv<double>(3);
-                    if (i < 3*_N / 4) {
-                        i1 = (i / _n) % (_n - 1); i2 = (i) % _n;
-                        base_func(x1_screen, x2_screen, x3_screen, t1, t2, i1, i2, 0, 1, v, 0);
+                    if (i < 3 * _N / 4) {
+                        i1 = (i / _n) % (_n - 1); i2 = (i) % _n; 
+                        base_func_rft(x1_screen, x2_screen, x3_screen, t1, t2, 0, i1, i2, 0, 1, 0, v);
                     }
                     else {
                         i1 = ((i) / (_n - 1)) % _n; i2 = (i) % (_n - 1);
-                        base_func(x1_screen, x2_screen, x3_screen, t1, t2, i1, i2, 0, 2, v, 0);
-                    }
+                        base_func_rft(x1_screen, x2_screen, x3_screen, t1, t2, 0, i1, i2, 0, 2, 0, v);
+                    }      
                     sum[0] += res[i] * v[0];
                     sum[1] += res[i] * v[1];
                     sum[2] += res[i] * v[2];
@@ -268,17 +268,3 @@ int main() {
     MPI_Finalize();
 }
 
-int main2() {
-    return 0;
-    complex<double>div1, div2, div3;
-    double** tensor = createm<double>(2, 2), **tensor_reverse = createm<double>(2, 2);
-
-   /* div1 = div<complex<double>>(0, tensor, tensor_reverse, x1_obj, x2_obj, x3_obj, 0.05, 0.03, 1, 1, 1, true);
-    cout << div1 << "\n";
-    
-    div2 = div<complex<double>>(1, tensor, tensor_reverse, x1_obj, x2_obj, x3_obj, 0.05, 0.03, 1, 1, 1, true);
-    cout << div2 << "\n";*/
-    
-    div3 = div<complex<double>>(2, tensor, tensor_reverse, x1_obj, x2_obj, x3_obj, 0.05, 0.03, 1, 1, 1, true);
-    cout << div3 << "\n";
-}
